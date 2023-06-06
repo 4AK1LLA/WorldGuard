@@ -33,6 +33,7 @@
         </dependency>
     </dependencies>
 
+    <!-- This block is not required, it is used for placing builded .jar in the defined path -->
     <build>
         <plugins>
             <plugin>

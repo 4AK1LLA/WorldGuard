@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.item.Item;
 
 public class BlockClickListener implements Listener {
 
@@ -17,7 +18,8 @@ public class BlockClickListener implements Listener {
             boolean isHoldingWand;
 
             try {
-                isHoldingWand = player.getInventory().getItemInHand().getCustomBlockData().getBoolean("wand");
+                Item item = event.getItem();
+                isHoldingWand = item.getCustomBlockData().getBoolean("wand");
             }
             catch (NullPointerException e) {
                 return;

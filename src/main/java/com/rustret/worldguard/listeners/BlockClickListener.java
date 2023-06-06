@@ -1,4 +1,4 @@
-package com.rustret.worldguard;
+package com.rustret.worldguard.listeners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
@@ -6,6 +6,8 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.Item;
+import com.rustret.worldguard.coordinates.Coord;
+import com.rustret.worldguard.WorldGuardContext;
 
 public class BlockClickListener implements Listener {
 

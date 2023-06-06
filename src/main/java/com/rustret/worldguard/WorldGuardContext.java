@@ -1,6 +1,8 @@
 package com.rustret.worldguard;
 
 import cn.nukkit.Player;
+import com.rustret.worldguard.coordinates.Coord;
+import com.rustret.worldguard.coordinates.CoordPair;
 
 import java.util.HashMap;
 import java.util.Map;

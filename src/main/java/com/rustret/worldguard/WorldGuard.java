@@ -7,6 +7,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.plugin.PluginBase;
+import com.rustret.worldguard.listeners.BlockClickListener;
+import com.rustret.worldguard.listeners.PlayerQuitListener;
+import com.rustret.worldguard.listeners.PlayerTeleportListener;
 
 import java.util.UUID;
 

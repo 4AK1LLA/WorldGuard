@@ -1,4 +1,4 @@
-package com.rustret.worldguard;
+package com.rustret.worldguard.coordinates;
 
 public class Coord {
     public int x, y, z;

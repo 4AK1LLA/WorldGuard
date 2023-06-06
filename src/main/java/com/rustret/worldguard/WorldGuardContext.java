@@ -40,6 +40,7 @@ public class WorldGuardContext {
 
         playerSelections.put(playerId, selection);
 
+        //REMOVE
         for (long key: playerSelections.keySet()) {
             String p1 = (playerSelections.get(key).pos1 == null) ? "null" : playerSelections.get(key).pos1.toString();
             String p2 = (playerSelections.get(key).pos2 == null) ? "null" : playerSelections.get(key).pos2.toString();

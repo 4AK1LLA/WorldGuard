@@ -1,17 +1,12 @@
 package com.rustret.worldguard;
 
-import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
-import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.plugin.PluginBase;
+import com.rustret.worldguard.commands.WandCommand;
 import com.rustret.worldguard.listeners.BlockClickListener;
 import com.rustret.worldguard.listeners.PlayerQuitListener;
 import com.rustret.worldguard.listeners.PlayerTeleportListener;
-
-import java.util.UUID;
 
 public class WorldGuard extends PluginBase {
     @Override
@@ -30,40 +25,16 @@ public class WorldGuard extends PluginBase {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (command.getName().equalsIgnoreCase("wand")) {
+            WandCommand.handle(sender, args);
 
-        if (!sender.isPlayer()) {
-            Messages.NOT_PLAYER.send(sender);
             return true;
         }
 
-        if (args.length > 0) {
-            Messages.WRONG_SYNTAX.send(sender, "/wand");
-            return true;
+        if (command.getName().equalsIgnoreCase("rg")) {
+            //RgCommand.handle();
         }
 
-        Player player = (Player)sender;
-
-        if (player.getInventory().isFull()) {
-            Messages.FULL_INVENTORY.send(sender);
-            return true;
-        }
-
-        Item wandAxe = new Item(ItemID.WOODEN_AXE);
-
-        if (!player.getInventory().canAddItem(wandAxe)) {
-            Messages.FULL_INVENTORY.send(sender);
-            return true;
-        }
-
-        CompoundTag wandTag = new CompoundTag();
-        wandTag.putString("uuid", UUID.randomUUID().toString());
-        wandTag.putBoolean("wand", true);
-        wandAxe.setCustomBlockData(wandTag);
-        wandAxe.setCustomName("Wand топор");
-
-        player.getInventory().addItem(wandAxe);
-        Messages.WAND_SUCCESS.send(sender);
-
-        return true;
+        return false;
     }
 }

@@ -37,10 +37,16 @@ public class WorldGuardContext {
         }
 
         playerSelections.put(playerId, selection);
+
         for (long key: playerSelections.keySet()) {
             String p1 = (playerSelections.get(key).pos1 == null) ? "null" : playerSelections.get(key).pos1.toString();
             String p2 = (playerSelections.get(key).pos2 == null) ? "null" : playerSelections.get(key).pos2.toString();
             System.out.println("Key: " + key + " Coordinates: " + p1 + " | " + p2);
         }
+    }
+
+    public static void removePlayerSelection(Player player) {
+        CoordPair p = playerSelections.remove(player.getId());
+        System.out.println(p);
     }
 }

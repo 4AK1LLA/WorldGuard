@@ -11,9 +11,7 @@ public class BlockClickListener implements Listener {
 
     @EventHandler
     public void onBlockClick(PlayerInteractEvent event) {
-
         if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-
             Player player = event.getPlayer();
             boolean isHoldingWand;
 

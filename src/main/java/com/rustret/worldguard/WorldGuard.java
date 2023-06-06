@@ -13,8 +13,8 @@ import java.util.UUID;
 public class WorldGuard extends PluginBase {
     @Override
     public void onEnable() {
-        BlockClickListener listener = new BlockClickListener();
-        getServer().getPluginManager().registerEvents(listener, this);
+        getServer().getPluginManager().registerEvents(new BlockClickListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
         getLogger().info("Plugin Enabled");
     }

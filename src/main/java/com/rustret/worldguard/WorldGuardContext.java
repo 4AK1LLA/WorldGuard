@@ -8,20 +8,39 @@ import java.util.Map;
 public class WorldGuardContext {
     private static final Map<Long, CoordPair> playerSelections = new HashMap<>();
 
-    public static void setPos(Player player) {
+    public static void setPlayerSelection(Player player, Coord incomeCoords) {
         long playerId = player.getId();
 
         CoordPair selection = playerSelections.get(playerId);
 
-        System.out.print(selection);
-
+        //Init selection and pos1
         if (selection == null) {
-            CoordPair newSelection = new CoordPair();
-            playerSelections.put(playerId, newSelection);
+            selection = new CoordPair();
+            selection.pos1 = incomeCoords;
 
-            System.out.print(playerSelections.get(playerId));
+            Messages.FIRST_POS.send(player, incomeCoords.toString());
         }
 
-        System.out.print("\n");
+        //Init pos2
+        else if (selection.pos2 == null) {
+            selection.pos2 = incomeCoords;
+
+            Messages.SECOND_POS.send(player, incomeCoords.toString());
+        }
+
+        //Reset selection and init pos1
+        else if (selection.pos1 != null) {
+            selection.pos1 = incomeCoords;
+            selection.pos2 = null;
+
+            Messages.FIRST_POS.send(player, incomeCoords.toString());
+        }
+
+        playerSelections.put(playerId, selection);
+        for (long key: playerSelections.keySet()) {
+            String p1 = (playerSelections.get(key).pos1 == null) ? "null" : playerSelections.get(key).pos1.toString();
+            String p2 = (playerSelections.get(key).pos2 == null) ? "null" : playerSelections.get(key).pos2.toString();
+            System.out.println("Key: " + key + " Coordinates: " + p1 + " | " + p2);
+        }
     }
 }

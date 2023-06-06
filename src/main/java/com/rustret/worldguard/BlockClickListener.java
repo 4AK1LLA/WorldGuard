@@ -31,10 +31,9 @@ public class BlockClickListener implements Listener {
                 int x = (int)block.getX();
                 int y = (int)block.getY();
                 int z = (int)block.getZ();
-                WorldGuardContext.setPos(player);
+                Coord coords = new Coord(x, y, z);
 
-                String coords = x + " " + y + " " + z;
-                Messages.FIRST_POS.send(player, coords);
+                WorldGuardContext.setPlayerSelection(player, coords);
             }
         }
     }

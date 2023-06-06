@@ -9,7 +9,8 @@ public enum Messages {
     FULL_INVENTORY (TextFormat.RED + "У вас заполнен инвентарь"),
     WAND_SUCCESS (TextFormat.GREEN + "Вы получили топорик для создания региона, теперь установите две точки и пропишите " + TextFormat.WHITE + "/rg claim [название региона]"),
     NOT_PLAYER (TextFormat.RED + "Эта комманда для игроков"),
-    FIRST_POS (TextFormat.GREEN + "Координаты первой точки " + TextFormat.WHITE + "%s");
+    FIRST_POS (TextFormat.GREEN + "Координаты первой точки " + TextFormat.WHITE + "%s"),
+    SECOND_POS (TextFormat.GREEN + "Координаты второй точки " + TextFormat.WHITE + "%s");
 
     private final String message;
 

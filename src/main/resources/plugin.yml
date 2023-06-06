@@ -8,6 +8,3 @@ commands:
   wand:
     description: Получить топорик для создания региона
     usage: "/wand"
-  rg:
-    description: Создание и редактирование регионов
-    usage: "/rg"

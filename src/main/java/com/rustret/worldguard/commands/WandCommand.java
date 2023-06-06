@@ -43,7 +43,7 @@ public class WandCommand {
         wandAxe.setCustomName("Wand топор");
 
         player.getInventory().addItem(wandAxe);
-        Messages.WAND_SUCCESS.send(sender);
+        Messages.WAND.send(sender);
 
         return true;
     }

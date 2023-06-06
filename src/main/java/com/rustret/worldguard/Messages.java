@@ -10,7 +10,7 @@ public enum Messages {
     WAND_SUCCESS (TextFormat.GREEN + "Вы получили топорик для создания региона, теперь установите две точки и пропишите " + TextFormat.WHITE + "/rg claim [название региона]"),
     NOT_PLAYER (TextFormat.RED + "Эта комманда для игроков"),
     FIRST_POS (TextFormat.GREEN + "Координаты первой точки " + TextFormat.WHITE + "%s"),
-    SECOND_POS (TextFormat.GREEN + "Координаты второй точки " + TextFormat.WHITE + "%s");
+    SECOND_POS (TextFormat.GREEN + "Координаты второй точки " + TextFormat.WHITE + "%s" + TextFormat.GREEN + "\nСоздайте регион с помоцью команды " + TextFormat.WHITE + "/rg claim [название региона]");
 
     private final String message;
 

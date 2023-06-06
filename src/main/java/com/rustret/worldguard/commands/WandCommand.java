@@ -25,7 +25,7 @@ public class WandCommand extends Command {
         }
 
         if (args.length > 0) {
-            Messages.WRONG_SYNTAX.send(sender, "/wand");
+            Messages.WRONG_SYNTAX.send(sender, getUsage());
             return true;
         }
 

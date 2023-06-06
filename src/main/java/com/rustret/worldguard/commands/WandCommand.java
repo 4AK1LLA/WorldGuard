@@ -1,6 +1,7 @@
 package com.rustret.worldguard.commands;
 
 import cn.nukkit.Player;
+import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
@@ -9,9 +10,15 @@ import com.rustret.worldguard.Messages;
 
 import java.util.UUID;
 
-public class WandCommand {
+public class WandCommand extends Command {
 
-    public static boolean handle(CommandSender sender, String[] args) {
+    public WandCommand() {
+        super("wand", "Получить топорик для создания региона", "/wand");
+        commandParameters.clear();
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, String s, String[] args) {
         if (!sender.isPlayer()) {
             Messages.NOT_PLAYER.send(sender);
             return true;
@@ -45,6 +52,6 @@ public class WandCommand {
         player.getInventory().addItem(wandAxe);
         Messages.WAND.send(sender);
 
-        return true;
+        return false;
     }
 }

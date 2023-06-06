@@ -9,8 +9,7 @@ import cn.nukkit.command.data.CommandParameter;
 public class RgCommand extends Command {
 
     public RgCommand() {
-        super("rg", "Создание и редактирование регионов", "/rg"); //try remove 3d arg
-
+        super("rg", "Создание и редактирование регионов", "/rg");
         commandParameters.clear();
 
         commandParameters.put("claimCommand", new CommandParameter[] {
@@ -25,7 +24,7 @@ public class RgCommand extends Command {
     }
 
     @Override
-    public boolean execute(CommandSender commandSender, String s, String[] strings) {
+    public boolean execute(CommandSender sender, String s, String[] args) {
         return false;
     }
 }

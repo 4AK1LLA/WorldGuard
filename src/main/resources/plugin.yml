@@ -1,0 +1,10 @@
+name: WorldGuard
+main: com.rustret.worldguard.WorldGuard
+version: "1.0.0"
+api: ["1.0.0"]
+description: Plugin for protecting players area
+
+commands:
+  wand:
+    description: Получить топорик для создания региона
+    usage: "/wand"

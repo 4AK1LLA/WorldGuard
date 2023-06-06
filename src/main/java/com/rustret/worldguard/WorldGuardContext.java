@@ -46,7 +46,6 @@ public class WorldGuardContext {
     }
 
     public static void removePlayerSelection(Player player) {
-        CoordPair p = playerSelections.remove(player.getId());
-        System.out.println(p);
+        playerSelections.remove(player.getId());
     }
 }

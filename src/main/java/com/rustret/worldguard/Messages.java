@@ -13,6 +13,8 @@ public enum Messages {
     SECOND_POS (TextFormat.GREEN + "Координаты второй точки " + TextFormat.WHITE + "%s" + TextFormat.GREEN + "\nСоздайте регион с помоцью команды " + TextFormat.WHITE + "/rg claim [название региона]"),
     RG (TextFormat.GREEN + "Посмотреть все команды привата " + TextFormat.WHITE + "/rg help"),
     RG_WRONG (TextFormat.RED + "Неизвестный параметр, посмотреть все команды привата " + TextFormat.WHITE + "/rg help"),
+    RG_NAME_LENGTH (TextFormat.RED + "Название региона должно иметь от " + TextFormat.WHITE + "3" + TextFormat.RED + " до " + TextFormat.WHITE + "12" + TextFormat.RED + " символов"),
+    RG_NAME_REGEX (TextFormat.RED + "Название региона должно состоять только из латинских букв " + TextFormat.WHITE + "a-z" + TextFormat.RED + " и цифр " + TextFormat.WHITE + "0-9"),
     RG_HELP (TextFormat.WHITE + "/rg claim [название региона]" + TextFormat.GREEN + " - создать регион\n" +
             TextFormat.WHITE + "/rg addmember [название региона] [ник игрока]" + TextFormat.GREEN + " - добавить игрока в регион\n" +
             TextFormat.WHITE + "/rg removemember [название региона] [ник игрока]" + TextFormat.GREEN + " - удалить игрока из региона");

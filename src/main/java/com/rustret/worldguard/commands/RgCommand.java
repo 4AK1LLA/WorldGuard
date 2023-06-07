@@ -7,6 +7,8 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
 
+import java.util.regex.Pattern;
+
 public class RgCommand extends Command {
 
     public RgCommand() {
@@ -44,14 +46,37 @@ public class RgCommand extends Command {
             case "help":
                 return help(sender, args);
             case "claim":
-                System.out.println("/rg claim");
-                break;
+                return claim(sender, args);
             default:
                 Messages.RG_WRONG.send(sender);
                 return true;
         }
+    }
 
-        return false;
+    private boolean claim(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            Messages.WRONG_SYNTAX.send(sender, "/rg claim [название региона]");
+            return true;
+        }
+
+        String regionName = args[1];
+
+        int length = regionName.length();
+        if (length < 3 || length > 12) {
+            Messages.RG_NAME_LENGTH.send(sender);
+            return true;
+        }
+
+        //Latin letters and numbers check
+        String pattern = "^[a-zA-Z0-9]+$";
+        if (!Pattern.matches(pattern, regionName)) {
+            Messages.RG_NAME_REGEX.send(sender);
+            return true;
+        }
+
+        sender.sendMessage("You created region with name " + args[1]);
+
+        return true;
     }
 
     private boolean help(CommandSender sender, String[] args) {

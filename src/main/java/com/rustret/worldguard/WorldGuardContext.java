@@ -10,6 +10,10 @@ import java.util.Map;
 public class WorldGuardContext {
     private static final Map<Long, CoordPair> playerSelections = new HashMap<>();
 
+    public static CoordPair getPlayerSelection(Player player) {
+        return playerSelections.get(player.getId());
+    }
+
     public static void setPlayerSelection(Player player, Coord incomeCoords) {
         long playerId = player.getId();
 

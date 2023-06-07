@@ -1,11 +1,14 @@
 package com.rustret.worldguard.commands;
 
+import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
+import com.rustret.worldguard.WorldGuardContext;
+import com.rustret.worldguard.coordinates.CoordPair;
 
 import java.util.regex.Pattern;
 
@@ -71,6 +74,14 @@ public class RgCommand extends Command {
         String pattern = "^[a-zA-Z0-9]+$";
         if (!Pattern.matches(pattern, regionName)) {
             Messages.RG_NAME_REGEX.send(sender);
+            return true;
+        }
+
+        Player player = (Player)sender;
+        CoordPair selection = WorldGuardContext.getPlayerSelection(player);
+
+        if (selection == null || selection.pos1 == null || selection.pos2 == null) {
+            Messages.MISSIING_SELECTION.send(sender);
             return true;
         }
 

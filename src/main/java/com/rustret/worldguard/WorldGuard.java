@@ -1,6 +1,7 @@
 package com.rustret.worldguard;
 
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.utils.Config;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -12,8 +13,15 @@ import java.sql.SQLException;
 public class WorldGuard extends PluginBase {
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+
+        Config config = getConfig();
+        String connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
+                config.get("MySql.host"), (int)config.get("MySql.port"), config.get("MySql.database"),
+                config.get("MySql.username"), config.get("MySql.password"));
+
         try {
-            ConnectionSource connectionSource = new JdbcConnectionSource("jdbc:mysql://localhost/worldguard?user=root&password=Pa$$w0rd&serverTimezone=UTC");
+            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
             TableUtils.createTableIfNotExists(connectionSource, Region.class);
         }
         catch (SQLException e) {

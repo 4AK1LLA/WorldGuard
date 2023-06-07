@@ -1,0 +1,8 @@
+# WorldGuard config
+
+MySql:
+  host: localhost
+  port: 3306
+  database: worldguard
+  username: root
+  password: Pa$$w0rd

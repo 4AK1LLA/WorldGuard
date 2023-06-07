@@ -31,6 +31,12 @@
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>ru.nukkit.dblib</groupId>
+            <artifactId>DbLib</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <!-- This block is not required, it is used for placing builded .jar in the defined path -->

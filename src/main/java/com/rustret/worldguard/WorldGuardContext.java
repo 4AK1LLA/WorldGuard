@@ -10,6 +10,10 @@ import java.util.Map;
 public class WorldGuardContext {
     private static final Map<Long, CoordPair> playerSelections = new HashMap<>();
 
+    public static CoordPair getPlayerSelection(Player player) {
+        return playerSelections.get(player.getId());
+    }
+
     public static void setPlayerSelection(Player player, Coord incomeCoords) {
         long playerId = player.getId();
 
@@ -20,14 +24,14 @@ public class WorldGuardContext {
             selection = new CoordPair();
             selection.pos1 = incomeCoords;
 
-            Messages.FIRST_POS.send(player, incomeCoords.toString());
+            Messages.FIRST_POS.send(player, incomeCoords.x, incomeCoords.y, incomeCoords.z);
         }
 
         //Init pos2
         else if (selection.pos2 == null) {
             selection.pos2 = incomeCoords;
 
-            Messages.SECOND_POS.send(player, incomeCoords.toString());
+            Messages.SECOND_POS.send(player, incomeCoords.x, incomeCoords.y, incomeCoords.z);
         }
 
         //Reset selection and init pos1
@@ -35,7 +39,7 @@ public class WorldGuardContext {
             selection.pos1 = incomeCoords;
             selection.pos2 = null;
 
-            Messages.FIRST_POS.send(player, incomeCoords.toString());
+            Messages.FIRST_POS.send(player, incomeCoords.x, incomeCoords.y, incomeCoords.z);
         }
 
         playerSelections.put(playerId, selection);

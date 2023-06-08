@@ -85,7 +85,23 @@ public class RgCommand extends Command {
             return true;
         }
 
-        sender.sendMessage("You created region with name " + args[1]);
+        int xLength = Math.abs(selection.pos2.x - selection.pos1.x) + 1;
+        int yLength = Math.abs(selection.pos2.y - selection.pos1.y) + 1;
+        int zLength = Math.abs(selection.pos2.z - selection.pos1.z) + 1;
+
+        //TODO: Add all limits to config
+        if (!player.hasPermission("worldguard.nolimit") && (xLength > 50 || yLength > 50 || zLength > 50)) {
+            Messages.RG_SIDE_LIMIT.send(sender);
+            return true;
+        }
+
+        int regionSize = xLength * yLength * zLength;
+        if (!player.hasPermission("worldguard.nolimit") && regionSize > 50000) {
+            Messages.RG_SIZE_LIMIT.send(sender);
+            return true;
+        }
+
+        sender.sendMessage(String.format("You created region with name %s and size %d", args[1], regionSize));
 
         return true;
     }

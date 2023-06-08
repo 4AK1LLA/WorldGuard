@@ -3,3 +3,8 @@ main: com.rustret.worldguard.WorldGuard
 version: "1.0.0"
 api: ["1.0.14"]
 description: Plugin for protecting players area
+
+permissions:
+  worldguard.nolimit:
+    description: "Removes region size limit"
+    default: false

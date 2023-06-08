@@ -17,6 +17,9 @@ public class RegionModel {
     private String ownerName;
 
     @DatabaseField
+    private String ownerId;
+
+    @DatabaseField
     private int x1;
 
     @DatabaseField
@@ -36,9 +39,10 @@ public class RegionModel {
 
     public RegionModel() { }
 
-    public RegionModel(String regionName, String ownerName, Coord pos1, Coord pos2) {
+    public RegionModel(String regionName, String ownerName, String ownerId, Coord pos1, Coord pos2) {
         this.regionName = regionName;
         this.ownerName = ownerName;
+        this.ownerId = ownerId;
         this.x1 = pos1.x;
         this.y1 = pos1.y;
         this.z1 = pos1.z;

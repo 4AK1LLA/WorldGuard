@@ -8,7 +8,9 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
 import com.rustret.worldguard.WorldGuardContext;
+import com.rustret.worldguard.coordinates.Coord;
 import com.rustret.worldguard.coordinates.CoordPair;
+import com.rustret.worldguard.dbmodels.RegionModel;
 
 import java.util.regex.Pattern;
 
@@ -75,7 +77,7 @@ public class RgCommand extends Command {
         }
 
         //Latin letters and numbers check
-        String pattern = "^[a-zA-Z0-9]+$";
+        String pattern = "^[a-z0-9]+$";
         if (!Pattern.matches(pattern, regionName)) {
             Messages.RG_NAME_REGEX.send(sender);
             return true;
@@ -105,9 +107,22 @@ public class RgCommand extends Command {
             return true;
         }
 
-        sender.sendMessage(String.format("You created region with name %s and size %d", args[1], regionSize));
+        String ownerName = player.getName();
+        String ownerId = player.getUniqueId().toString();
+        Coord pos1 = new Coord(selection.pos1.x, selection.pos1.y, selection.pos1.z);
+        Coord pos2 = new Coord(selection.pos2.x, selection.pos2.y, selection.pos2.z);
+        RegionModel region = new RegionModel(regionName, ownerName, ownerId, pos1, pos2);
 
-        return true;
+        int result = context.addRegion(region);
+
+        if (result == 1) {
+            context.removePlayerSelection(player);
+
+            Messages.RG_CLAIM.send(sender, regionName, regionSize);
+            return true;
+        }
+
+        return false;
     }
 
     private boolean help(CommandSender sender, String[] args) {

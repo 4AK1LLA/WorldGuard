@@ -12,23 +12,6 @@ public class WorldGuard extends PluginBase {
 
         WorldGuardContext context = new WorldGuardContext(getConfig());
 
-//        try {
-//            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
-//            TableUtils.createTableIfNotExists(connectionSource, RegionModel.class);
-//
-//            Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
-//
-//            boolean isEmpty = dao.queryForAll().isEmpty();
-//
-//            if (isEmpty) {
-//                RegionModel rg = new RegionModel("testrg", "p4ssydestr0yer", new Coord(100, 100, 60), new Coord(120, 120, 80));
-//                dao.create(rg);
-//            }
-//        }
-//        catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-
         getServer().getCommandMap().register("wand", new WandCommand());
         getServer().getCommandMap().register("rg", new RgCommand(context));
 

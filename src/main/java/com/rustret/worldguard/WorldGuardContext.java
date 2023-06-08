@@ -2,6 +2,8 @@ package com.rustret.worldguard;
 
 import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -9,7 +11,6 @@ import com.rustret.worldguard.coordinates.Coord;
 import com.rustret.worldguard.coordinates.CoordPair;
 import com.rustret.worldguard.dbmodels.RegionModel;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +28,9 @@ public class WorldGuardContext {
         try {
             ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
             TableUtils.createTableIfNotExists(connectionSource, RegionModel.class);
-        }
-        catch (SQLException e) {
+
+            connectionSource.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -77,5 +79,23 @@ public class WorldGuardContext {
 
     public void removePlayerSelection(Player player) {
         playerSelections.remove(player.getId());
+    }
+
+    public int addRegion(RegionModel region) {
+        int result = 0;
+
+        try {
+            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
+            Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
+
+            result = dao.create(region);
+
+            connectionSource.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }

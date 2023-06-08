@@ -13,9 +13,13 @@ import com.rustret.worldguard.coordinates.CoordPair;
 import java.util.regex.Pattern;
 
 public class RgCommand extends Command {
+    private final WorldGuardContext context;
 
-    public RgCommand() {
+    public RgCommand(WorldGuardContext context) {
         super("rg", "Создание и редактирование регионов", "/rg");
+
+        this.context = context;
+
         commandParameters.clear();
 
         commandParameters.put("helpCommand", new CommandParameter[] {
@@ -78,7 +82,7 @@ public class RgCommand extends Command {
         }
 
         Player player = (Player)sender;
-        CoordPair selection = WorldGuardContext.getPlayerSelection(player);
+        CoordPair selection = context.getPlayerSelection(player);
 
         if (selection == null || selection.pos1 == null || selection.pos2 == null) {
             Messages.MISSIING_SELECTION.send(sender);

@@ -1,20 +1,43 @@
 package com.rustret.worldguard;
 
 import cn.nukkit.Player;
+import cn.nukkit.utils.Config;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 import com.rustret.worldguard.coordinates.Coord;
 import com.rustret.worldguard.coordinates.CoordPair;
+import com.rustret.worldguard.dbmodels.RegionModel;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class WorldGuardContext {
-    private static final Map<Long, CoordPair> playerSelections = new HashMap<>();
+    private final String connectionString;
+    private final Map<Long, CoordPair> playerSelections;
 
-    public static CoordPair getPlayerSelection(Player player) {
+    WorldGuardContext(Config config) {
+        playerSelections = new HashMap<>();
+
+        connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
+                config.get("MySql.host"), (int)config.get("MySql.port"), config.get("MySql.database"),
+                config.get("MySql.username"), config.get("MySql.password"));
+
+        try {
+            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
+            TableUtils.createTableIfNotExists(connectionSource, RegionModel.class);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public CoordPair getPlayerSelection(Player player) {
         return playerSelections.get(player.getId());
     }
 
-    public static void setPlayerSelection(Player player, Coord incomeCoords) {
+    public void setPlayerSelection(Player player, Coord incomeCoords) {
         long playerId = player.getId();
 
         CoordPair selection = playerSelections.get(playerId);
@@ -52,7 +75,7 @@ public class WorldGuardContext {
         }
     }
 
-    public static void removePlayerSelection(Player player) {
+    public void removePlayerSelection(Player player) {
         playerSelections.remove(player.getId());
     }
 }

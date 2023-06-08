@@ -10,6 +10,11 @@ import com.rustret.worldguard.coordinates.Coord;
 import com.rustret.worldguard.WorldGuardContext;
 
 public class BlockClickListener implements Listener {
+    private final WorldGuardContext context;
+
+    public BlockClickListener(WorldGuardContext context) {
+        this.context = context;
+    }
 
     @EventHandler
     public void onBlockClick(PlayerInteractEvent event) {
@@ -33,7 +38,7 @@ public class BlockClickListener implements Listener {
                 int z = (int)block.getZ();
                 Coord coords = new Coord(x, y, z);
 
-                WorldGuardContext.setPlayerSelection(player, coords);
+                context.setPlayerSelection(player, coords);
             }
         }
     }

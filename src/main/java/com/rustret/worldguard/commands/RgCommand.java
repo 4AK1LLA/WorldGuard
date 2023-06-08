@@ -33,6 +33,11 @@ public class RgCommand extends Command {
                 CommandParameter.newType("regionName", CommandParamType.STRING)
         });
 
+        commandParameters.put("deleteCommand", new CommandParameter[] {
+                CommandParameter.newEnum("deleteParameter", new CommandEnum("deleteOption", "delete")),
+                CommandParameter.newType("regionName", CommandParamType.STRING)
+        });
+
         commandParameters.put("addmemberCommand", new CommandParameter[] {
                 CommandParameter.newEnum("addmemberParameter", new CommandEnum("addmemberOption", "addmember")),
                 CommandParameter.newType("player", CommandParamType.TARGET)
@@ -56,6 +61,8 @@ public class RgCommand extends Command {
                 return help(sender, args);
             case "claim":
                 return claim(sender, args);
+            case "delete":
+                return delete(sender, args);
             default:
                 Messages.RG_WRONG.send(sender);
                 return true;
@@ -96,13 +103,13 @@ public class RgCommand extends Command {
         int zLength = Math.abs(selection.pos2.z - selection.pos1.z) + 1;
 
         //TODO: Add all limits to config
-        if (!player.hasPermission("worldguard.nolimit") && (xLength > 50 || yLength > 50 || zLength > 50)) {
+        if (!player.hasPermission("worldguard.god") && (xLength > 50 || yLength > 50 || zLength > 50)) {
             Messages.RG_SIDE_LIMIT.send(sender);
             return true;
         }
 
         int regionSize = xLength * yLength * zLength;
-        if (!player.hasPermission("worldguard.nolimit") && regionSize > 50000) {
+        if (!player.hasPermission("worldguard.god") && regionSize > 50000) {
             Messages.RG_SIZE_LIMIT.send(sender);
             return true;
         }
@@ -113,12 +120,41 @@ public class RgCommand extends Command {
         Coord pos2 = new Coord(selection.pos2.x, selection.pos2.y, selection.pos2.z);
         RegionModel region = new RegionModel(regionName, ownerName, ownerId, pos1, pos2);
 
-        int result = context.addRegion(region);
-
-        if (result == 1) {
+        if (context.addRegion(region)) {
             context.removePlayerSelection(player);
 
             Messages.RG_CLAIM.send(sender, regionName, regionSize);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean delete(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            Messages.WRONG_SYNTAX.send(sender, "/rg delete [название региона]");
+            return true;
+        }
+
+        String regionName = args[1];
+
+        int length = regionName.length();
+        if (length < 3 || length > 12) {
+            Messages.RG_NAME_LENGTH.send(sender);
+            return true;
+        }
+
+        //Latin letters and numbers check
+        String pattern = "^[a-z0-9]+$";
+        if (!Pattern.matches(pattern, regionName)) {
+            Messages.RG_NAME_REGEX.send(sender);
+            return true;
+        }
+
+        Player player = (Player)sender;
+
+        if (context.removeRegion(regionName, player)) {
+            Messages.RG_DELETE.send(sender, regionName);
             return true;
         }
 

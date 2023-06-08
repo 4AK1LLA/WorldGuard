@@ -68,27 +68,58 @@ public class WorldGuardContext {
         }
 
         playerSelections.put(playerId, selection);
-
-        //REMOVE
-        for (long key: playerSelections.keySet()) {
-            String p1 = (playerSelections.get(key).pos1 == null) ? "null" : playerSelections.get(key).pos1.toString();
-            String p2 = (playerSelections.get(key).pos2 == null) ? "null" : playerSelections.get(key).pos2.toString();
-            System.out.println("Key: " + key + " Coordinates: " + p1 + " | " + p2);
-        }
     }
 
     public void removePlayerSelection(Player player) {
         playerSelections.remove(player.getId());
     }
 
-    public int addRegion(RegionModel region) {
-        int result = 0;
+    public boolean addRegion(RegionModel region) {
+        boolean result = false;
 
         try {
             ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
             Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
 
-            result = dao.create(region);
+            result = dao.create(region) == 1;
+
+            connectionSource.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public boolean removeRegion(String regionName, Player player) {
+        boolean result = false;
+
+        try {
+            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
+            Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
+
+            RegionModel region = dao.queryForFirst(
+                    dao
+                    .queryBuilder()
+                    .where()
+                    .eq("regionName", regionName)
+                    .prepare());
+
+            if (region == null) {
+                Messages.RG_NOT_EXIST.send(player, regionName);
+                connectionSource.close();
+                return false;
+            }
+
+            boolean ownerIsValid = region.getOwnerId().equals(player.getUniqueId().toString());
+            if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
+                Messages.RG_NOT_OWNER.send(player);
+                connectionSource.close();
+                return false;
+            }
+
+            result = dao.delete(region) == 1;
 
             connectionSource.close();
         }

@@ -50,4 +50,8 @@ public class RegionModel {
         this.y2 = pos2.y;
         this.z2 = pos2.z;
     }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
 }

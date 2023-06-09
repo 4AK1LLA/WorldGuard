@@ -54,4 +54,12 @@ public class RegionModel {
     public String getOwnerId() {
         return ownerId;
     }
+
+    public Coord getPos1() {
+        return new Coord(x1, y1, z1);
+    }
+
+    public Coord getPos2() {
+        return new Coord(x2, y2, z2);
+    }
 }

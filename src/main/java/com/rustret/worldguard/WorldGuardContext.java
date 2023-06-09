@@ -1,6 +1,7 @@
 package com.rustret.worldguard;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.utils.Config;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -12,6 +13,7 @@ import com.rustret.worldguard.coordinates.CoordPair;
 import com.rustret.worldguard.dbmodels.RegionModel;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WorldGuardContext {
@@ -128,5 +130,41 @@ public class WorldGuardContext {
         }
 
         return result;
+    }
+
+    public boolean blockIsPrivated(Block block) {
+        int x = (int)block.getX();
+        int y = (int)block.getY();
+        int z = (int)block.getZ();
+
+        try {
+            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
+            Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
+
+            List<RegionModel> regions = dao.queryForAll();
+
+            for (RegionModel rg : regions) {
+                Coord pos1 = rg.getPos1();
+                Coord pos2 = rg.getPos2();
+
+                int minX = Math.min(pos1.x, pos2.x);
+                int maxX = Math.max(pos1.x, pos2.x);
+                int minY = Math.min(pos1.y, pos2.y);
+                int maxY = Math.max(pos1.y, pos2.y);
+                int minZ = Math.min(pos1.z, pos2.z);
+                int maxZ = Math.max(pos1.z, pos2.z);
+
+                if (x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ) {
+                    connectionSource.close();
+                    return true;
+                }
+            }
+
+            connectionSource.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

@@ -3,6 +3,10 @@ package com.rustret.worldguard;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.utils.Config;
+import com.github.davidmoten.rtreemulti.Entry;
+import com.github.davidmoten.rtreemulti.RTree;
+import com.github.davidmoten.rtreemulti.geometry.Point;
+import com.github.davidmoten.rtreemulti.geometry.Rectangle;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -19,8 +23,21 @@ import java.util.Map;
 public class WorldGuardContext {
     private final String connectionString;
     private final Map<Long, CoordPair> playerSelections;
+    private RTree<String, Rectangle> rtree;
 
     WorldGuardContext(Config config) {
+        rtree = RTree.dimensions(3).create();
+
+        //x1 y1 z1 x2 y2 z2
+        rtree = rtree.add("test", Rectangle.create(-1022, 104, -1953, -1018, 107, -1948));
+
+        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(-1022, 104, -1953));
+
+        for (Entry<String, Rectangle> e: result) {
+            System.out.println(e.value());
+            System.out.println(e.geometry());
+        }
+
         playerSelections = new HashMap<>();
 
         connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",

@@ -114,7 +114,13 @@ public class RgCommand extends Command {
             return true;
         }
 
+        if (context.getRegion(regionName) != null) {
+            Messages.RG_EXIST.send(sender, regionName);
+            return true;
+        }
+
         if (context.intersectsRegion(selection)) {
+            context.removePlayerSelection(player);
             Messages.RG_INTERSECT.send(sender);
             return true;
         }
@@ -127,7 +133,6 @@ public class RgCommand extends Command {
 
         if (context.addRegion(regionName, region)) {
             context.removePlayerSelection(player);
-
             Messages.RG_CLAIM.send(sender, regionName, regionSize);
             return true;
         }

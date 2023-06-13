@@ -10,7 +10,7 @@ public class RegionModel {
     @DatabaseField(generatedId = true)
     private int regionId;
 
-    @DatabaseField
+    @DatabaseField(unique = true)
     private String regionName;
 
     @DatabaseField

@@ -11,6 +11,7 @@ public class WorldGuard extends PluginBase {
         saveDefaultConfig();
 
         WorldGuardContext context = new WorldGuardContext(getConfig());
+        getLogger().info("Number of loaded regions - " + context.getRegionsCount());
 
         getServer().getCommandMap().register("wand", new WandCommand());
         getServer().getCommandMap().register("rg", new RgCommand(context));

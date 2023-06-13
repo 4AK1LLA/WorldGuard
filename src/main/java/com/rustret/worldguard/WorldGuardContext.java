@@ -186,4 +186,8 @@ public class WorldGuardContext {
 
         return result.iterator().hasNext();
     }
+
+    public int getRegionsCount() {
+        return regions.size();
+    }
 }

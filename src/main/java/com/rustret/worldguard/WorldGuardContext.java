@@ -140,20 +140,11 @@ public class WorldGuardContext {
         return true;
     }
 
-    public boolean removeRegion(String regionName, Player player) {
-        Region region = regions.get(regionName);
+    public Region getRegion(String regionName) {
+        return regions.get(regionName);
+    }
 
-        if (region == null) {
-            Messages.RG_NOT_EXIST.send(player, regionName);
-            return false;
-        }
-
-        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId().toString());
-        if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
-            Messages.RG_NOT_OWNER.send(player);
-            return false;
-        }
-
+    public boolean removeRegion(String regionName) {
         boolean success = false;
         try {
             ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
@@ -178,18 +169,20 @@ public class WorldGuardContext {
             return false;
         }
 
-        regions.remove(regionName);
-        rtree = rtree.delete(regionName, createRectangle(region.pos1, region.pos2));
+        Region removedRg = regions.remove(regionName);
+        rtree = rtree.delete(regionName, createRectangle(removedRg.pos1, removedRg.pos2));
 
         return true;
     }
 
     public boolean blockIsPrivated(Block block) {
-        int x = (int)block.getX();
-        int y = (int)block.getY();
-        int z = (int)block.getZ();
+        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create((int)block.getX(), (int)block.getY(), (int)block.getZ()));
 
-        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(x, y, z));
+        return result.iterator().hasNext();
+    }
+
+    public boolean intersectsRegion(CoordPair selection) {
+        Iterable<Entry<String, Rectangle>> result = rtree.search(createRectangle(selection.pos1, selection.pos2));
 
         return result.iterator().hasNext();
     }

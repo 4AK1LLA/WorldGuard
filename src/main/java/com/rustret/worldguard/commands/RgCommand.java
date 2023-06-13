@@ -114,6 +114,11 @@ public class RgCommand extends Command {
             return true;
         }
 
+        if (context.intersectsRegion(selection)) {
+            Messages.RG_INTERSECT.send(sender);
+            return true;
+        }
+
         String ownerName = player.getName();
         String ownerId = player.getUniqueId().toString();
         Coord pos1 = new Coord(selection.pos1.x, selection.pos1.y, selection.pos1.z);
@@ -151,9 +156,22 @@ public class RgCommand extends Command {
             return true;
         }
 
+        Region region = context.getRegion(regionName);
+
+        if (region == null) {
+            Messages.RG_NOT_EXIST.send(sender, regionName);
+            return false;
+        }
+
         Player player = (Player)sender;
 
-        if (context.removeRegion(regionName, player)) {
+        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId().toString());
+        if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
+            Messages.RG_NOT_OWNER.send(sender);
+            return false;
+        }
+
+        if (context.removeRegion(regionName)) {
             Messages.RG_DELETE.send(sender, regionName);
             return true;
         }

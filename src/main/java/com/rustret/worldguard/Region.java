@@ -1,19 +1,20 @@
 package com.rustret.worldguard;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
+import com.rustret.worldguard.coordinates.Coord;
 
-@DatabaseTable(tableName = "regions")
 public class Region {
+    public String ownerName;
 
-    @DatabaseField(generatedId = true)
-    private int regionId;
+    public String ownerId;
 
-    @DatabaseField
-    private String regionName;
+    public Coord pos1;
 
-    @DatabaseField
-    private String ownerName;
+    public Coord pos2;
 
-    public Region() { }
+    public Region(String ownerName, String ownerId, Coord pos1, Coord pos2) {
+        this.ownerName = ownerName;
+        this.ownerId = ownerId;
+        this.pos1 = pos1;
+        this.pos2 = pos2;
+    }
 }

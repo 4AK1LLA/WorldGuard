@@ -1,39 +1,24 @@
 package com.rustret.worldguard;
 
 import cn.nukkit.plugin.PluginBase;
-import cn.nukkit.utils.Config;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
-import com.j256.ormlite.table.TableUtils;
 import com.rustret.worldguard.commands.*;
 import com.rustret.worldguard.listeners.*;
 
-import java.sql.SQLException;
-
 public class WorldGuard extends PluginBase {
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
-        Config config = getConfig();
-        String connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
-                config.get("MySql.host"), (int)config.get("MySql.port"), config.get("MySql.database"),
-                config.get("MySql.username"), config.get("MySql.password"));
-
-        try {
-            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
-            TableUtils.createTableIfNotExists(connectionSource, Region.class);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
+        WorldGuardContext context = new WorldGuardContext(getConfig());
+        getLogger().info("Number of loaded regions - " + context.getRegionsCount());
 
         getServer().getCommandMap().register("wand", new WandCommand());
-        getServer().getCommandMap().register("rg", new RgCommand());
+        getServer().getCommandMap().register("rg", new RgCommand(context));
 
-        getServer().getPluginManager().registerEvents(new BlockClickListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerTeleportListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockClickListener(context), this);
+        getServer().getPluginManager().registerEvents(new PlayerLeaveListener(context), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(context), this);
 
         getLogger().info("Plugin Enabled");
     }

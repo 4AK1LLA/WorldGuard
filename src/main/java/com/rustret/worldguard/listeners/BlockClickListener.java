@@ -10,11 +10,15 @@ import com.rustret.worldguard.coordinates.Coord;
 import com.rustret.worldguard.WorldGuardContext;
 
 public class BlockClickListener implements Listener {
+    private final WorldGuardContext context;
+
+    public BlockClickListener(WorldGuardContext context) {
+        this.context = context;
+    }
 
     @EventHandler
     public void onBlockClick(PlayerInteractEvent event) {
         if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            Player player = event.getPlayer();
             boolean isHoldingWand;
 
             try {
@@ -32,8 +36,9 @@ public class BlockClickListener implements Listener {
                 int y = (int)block.getY();
                 int z = (int)block.getZ();
                 Coord coords = new Coord(x, y, z);
+                Player player = event.getPlayer();
 
-                WorldGuardContext.setPlayerSelection(player, coords);
+                context.setPlayerSelection(player, coords);
             }
         }
     }

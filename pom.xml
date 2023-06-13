@@ -41,6 +41,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>rtree-multi</artifactId>
+            <version>0.1</version>
+        </dependency>
 
     </dependencies>
 
@@ -65,7 +70,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <outputDirectory>C:\Users\youwa\Desktop\TestServ\plugins</outputDirectory>
+                    <outputDirectory>C:\Users\youwa\Desktop\TestServ1.20\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

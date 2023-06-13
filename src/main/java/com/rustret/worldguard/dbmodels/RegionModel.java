@@ -51,6 +51,14 @@ public class RegionModel {
         this.z2 = pos2.z;
     }
 
+    public String getRegionName() {
+        return regionName;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
     public String getOwnerId() {
         return ownerId;
     }

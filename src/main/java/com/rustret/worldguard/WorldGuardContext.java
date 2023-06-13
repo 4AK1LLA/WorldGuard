@@ -23,35 +23,57 @@ import java.util.Map;
 public class WorldGuardContext {
     private final String connectionString;
     private final Map<Long, CoordPair> playerSelections;
+    private final Map<String, Region> regions;
     private RTree<String, Rectangle> rtree;
 
     WorldGuardContext(Config config) {
-        rtree = RTree.dimensions(3).create();
-
-        //x1 y1 z1 x2 y2 z2
-        rtree = rtree.add("test", Rectangle.create(-1022, 104, -1953, -1018, 107, -1948));
-
-        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(-1022, 104, -1953));
-
-        for (Entry<String, Rectangle> e: result) {
-            System.out.println(e.value());
-            System.out.println(e.geometry());
-        }
-
         playerSelections = new HashMap<>();
-
+        regions = new HashMap<>();
+        rtree = RTree.dimensions(3).create();
         connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
                 config.get("MySql.host"), (int)config.get("MySql.port"), config.get("MySql.database"),
                 config.get("MySql.username"), config.get("MySql.password"));
 
+        List<RegionModel> dbRegions = null;
         try {
             ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
             TableUtils.createTableIfNotExists(connectionSource, RegionModel.class);
 
+            Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
+            dbRegions = dao.queryForAll();
+
             connectionSource.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
+
+        if (dbRegions == null || dbRegions.size() == 0) {
+            return;
+        }
+
+        for (RegionModel model: dbRegions) {
+            String regionName = model.getRegionName();
+            Coord pos1 = model.getPos1();
+            Coord pos2 = model.getPos2();
+
+            Region region = new Region(model.getOwnerName(), model.getOwnerId(), pos1, pos2);
+            regions.put(regionName, region);
+
+            rtree = rtree.add(regionName, createRectangle(pos1, pos2));
+        }
+    }
+
+    private Rectangle createRectangle(Coord pos1, Coord pos2) {
+        int minX = Math.min(pos1.x, pos2.x);
+        int minY = Math.min(pos1.y, pos2.y);
+        int minZ = Math.min(pos1.z, pos2.z);
+
+        int maxX = Math.max(pos1.x, pos2.x);
+        int maxY = Math.max(pos1.y, pos2.y);
+        int maxZ = Math.max(pos1.z, pos2.z);
+
+        return Rectangle.create(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public CoordPair getPlayerSelection(Player player) {
@@ -93,14 +115,14 @@ public class WorldGuardContext {
         playerSelections.remove(player.getId());
     }
 
-    public boolean addRegion(RegionModel region) {
-        boolean result = false;
-
+    public boolean addRegion(String regionName, Region region) {
+        boolean success = false;
         try {
             ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
             Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
 
-            result = dao.create(region) == 1;
+            RegionModel model = new RegionModel(regionName, region.ownerName, region.ownerId, region.pos1, region.pos2);
+            success = dao.create(model) == 1;
 
             connectionSource.close();
         }
@@ -108,37 +130,43 @@ public class WorldGuardContext {
             e.printStackTrace();
         }
 
-        return result;
+        if (!success) {
+            return false;
+        }
+
+        regions.put(regionName, region);
+        rtree = rtree.add(regionName, createRectangle(region.pos1, region.pos2));
+
+        return true;
     }
 
     public boolean removeRegion(String regionName, Player player) {
-        boolean result = false;
+        Region region = regions.get(regionName);
 
+        if (region == null) {
+            Messages.RG_NOT_EXIST.send(player, regionName);
+            return false;
+        }
+
+        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId().toString());
+        if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
+            Messages.RG_NOT_OWNER.send(player);
+            return false;
+        }
+
+        boolean success = false;
         try {
             ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
             Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
 
-            RegionModel region = dao.queryForFirst(
+            RegionModel model = dao.queryForFirst(
                     dao
                     .queryBuilder()
                     .where()
                     .eq("regionName", regionName)
                     .prepare());
 
-            if (region == null) {
-                Messages.RG_NOT_EXIST.send(player, regionName);
-                connectionSource.close();
-                return false;
-            }
-
-            boolean ownerIsValid = region.getOwnerId().equals(player.getUniqueId().toString());
-            if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
-                Messages.RG_NOT_OWNER.send(player);
-                connectionSource.close();
-                return false;
-            }
-
-            result = dao.delete(region) == 1;
+            success = dao.delete(model) == 1;
 
             connectionSource.close();
         }
@@ -146,7 +174,14 @@ public class WorldGuardContext {
             e.printStackTrace();
         }
 
-        return result;
+        if (!success) {
+            return false;
+        }
+
+        regions.remove(regionName);
+        rtree = rtree.delete(regionName, createRectangle(region.pos1, region.pos2));
+
+        return true;
     }
 
     public boolean blockIsPrivated(Block block) {
@@ -154,34 +189,8 @@ public class WorldGuardContext {
         int y = (int)block.getY();
         int z = (int)block.getZ();
 
-        try {
-            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
-            Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
+        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(x, y, z));
 
-            List<RegionModel> regions = dao.queryForAll();
-
-            for (RegionModel rg : regions) {
-                Coord pos1 = rg.getPos1();
-                Coord pos2 = rg.getPos2();
-
-                int minX = Math.min(pos1.x, pos2.x);
-                int maxX = Math.max(pos1.x, pos2.x);
-                int minY = Math.min(pos1.y, pos2.y);
-                int maxY = Math.max(pos1.y, pos2.y);
-                int minZ = Math.min(pos1.z, pos2.z);
-                int maxZ = Math.max(pos1.z, pos2.z);
-
-                if (x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ) {
-                    connectionSource.close();
-                    return true;
-                }
-            }
-
-            connectionSource.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
+        return result.iterator().hasNext();
     }
 }

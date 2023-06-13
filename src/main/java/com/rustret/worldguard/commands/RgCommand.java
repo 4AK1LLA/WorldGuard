@@ -7,10 +7,10 @@ import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
+import com.rustret.worldguard.Region;
 import com.rustret.worldguard.WorldGuardContext;
 import com.rustret.worldguard.coordinates.Coord;
 import com.rustret.worldguard.coordinates.CoordPair;
-import com.rustret.worldguard.dbmodels.RegionModel;
 
 import java.util.regex.Pattern;
 
@@ -118,9 +118,9 @@ public class RgCommand extends Command {
         String ownerId = player.getUniqueId().toString();
         Coord pos1 = new Coord(selection.pos1.x, selection.pos1.y, selection.pos1.z);
         Coord pos2 = new Coord(selection.pos2.x, selection.pos2.y, selection.pos2.z);
-        RegionModel region = new RegionModel(regionName, ownerName, ownerId, pos1, pos2);
+        Region region = new Region(ownerName, ownerId, pos1, pos2);
 
-        if (context.addRegion(region)) {
+        if (context.addRegion(regionName, region)) {
             context.removePlayerSelection(player);
 
             Messages.RG_CLAIM.send(sender, regionName, regionSize);

@@ -175,10 +175,17 @@ public class WorldGuardContext {
         return true;
     }
 
-    public boolean blockIsPrivated(Block block) {
+    public boolean canBuild(Block block, Player player) {
         Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create((int)block.getX(), (int)block.getY(), (int)block.getZ()));
 
-        return result.iterator().hasNext();
+        if (!result.iterator().hasNext()) {
+            return true;
+        }
+
+        String regionName = result.iterator().next().value();
+        Region region = regions.get(regionName);
+
+        return region.ownerId.equals(player.getUniqueId().toString()) || player.hasPermission("worldguard.god");
     }
 
     public boolean intersectsRegion(CoordPair selection) {

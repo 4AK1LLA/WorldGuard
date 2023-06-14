@@ -18,7 +18,7 @@ public class WorldGuard extends PluginBase {
 
         getServer().getPluginManager().registerEvents(new BlockClickListener(context), this);
         getServer().getPluginManager().registerEvents(new PlayerLeaveListener(context), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(context), this);
+        getServer().getPluginManager().registerEvents(new PlayerBuildListener(context), this);
 
         getLogger().info("Plugin Enabled");
     }

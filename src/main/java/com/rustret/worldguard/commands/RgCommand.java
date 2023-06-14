@@ -12,6 +12,7 @@ import com.rustret.worldguard.WorldGuardContext;
 import com.rustret.worldguard.coordinates.Coord;
 import com.rustret.worldguard.coordinates.CoordPair;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class RgCommand extends Command {
@@ -126,8 +127,14 @@ public class RgCommand extends Command {
             return true;
         }
 
+        UUID ownerId = player.getUniqueId();
+        if (!player.hasPermission("worldguard.god") && context.getPlayerRegionsCount(ownerId) >= 2) {
+            context.removePlayerSelection(player);
+            Messages.RG_COUNT_LIMIT.send(sender);
+            return true;
+        }
+
         String ownerName = player.getName();
-        String ownerId = player.getUniqueId().toString();
         Coord pos1 = new Coord(selection.pos1.x, selection.pos1.y, selection.pos1.z);
         Coord pos2 = new Coord(selection.pos2.x, selection.pos2.y, selection.pos2.z);
         Region region = new Region(ownerName, ownerId, pos1, pos2);
@@ -171,7 +178,7 @@ public class RgCommand extends Command {
 
         Player player = (Player)sender;
 
-        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId().toString());
+        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId());
         if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
             Messages.RG_NOT_OWNER.send(sender);
             return false;

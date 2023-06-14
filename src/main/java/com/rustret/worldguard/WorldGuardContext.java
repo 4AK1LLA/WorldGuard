@@ -19,6 +19,7 @@ import com.rustret.worldguard.dbmodels.RegionModel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class WorldGuardContext {
     private final String connectionString;
@@ -57,7 +58,7 @@ public class WorldGuardContext {
             Coord pos1 = model.getPos1();
             Coord pos2 = model.getPos2();
 
-            Region region = new Region(model.getOwnerName(), model.getOwnerId(), pos1, pos2);
+            Region region = new Region(model.getOwnerName(), UUID.fromString(model.getOwnerId()), pos1, pos2);
             regions.put(regionName, region);
 
             rtree = rtree.add(regionName, createRectangle(pos1, pos2));
@@ -121,7 +122,7 @@ public class WorldGuardContext {
             ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
             Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
 
-            RegionModel model = new RegionModel(regionName, region.ownerName, region.ownerId, region.pos1, region.pos2);
+            RegionModel model = new RegionModel(regionName, region.ownerName, region.ownerId.toString(), region.pos1, region.pos2);
             success = dao.create(model) == 1;
 
             connectionSource.close();
@@ -196,5 +197,12 @@ public class WorldGuardContext {
 
     public int getRegionsCount() {
         return regions.size();
+    }
+
+    public long getPlayerRegionsCount(UUID playerId) {
+        return regions.values()
+                .stream()
+                .filter(region -> region.ownerId.equals(playerId))
+                .count();
     }
 }

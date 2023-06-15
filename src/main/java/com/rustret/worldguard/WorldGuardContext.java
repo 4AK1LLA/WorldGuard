@@ -2,6 +2,7 @@ package com.rustret.worldguard;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.level.Position;
 import cn.nukkit.utils.Config;
 import com.github.davidmoten.rtreemulti.Entry;
 import com.github.davidmoten.rtreemulti.RTree;
@@ -177,7 +178,7 @@ public class WorldGuardContext {
     }
 
     public boolean canBuild(Block block, Player player) {
-        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create((int)block.getX(), (int)block.getY(), (int)block.getZ()));
+        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(block.getX(), block.getY(), block.getZ()));
 
         if (!result.iterator().hasNext()) {
             return true;
@@ -186,7 +187,20 @@ public class WorldGuardContext {
         String regionName = result.iterator().next().value();
         Region region = regions.get(regionName);
 
-        return region.ownerId.equals(player.getUniqueId().toString()) || player.hasPermission("worldguard.god");
+        return region.ownerId.equals(player.getUniqueId()) || player.hasPermission("worldguard.god");
+    }
+
+    public boolean canInteract(Position position, Player player) {
+        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(position.x, position.y, position.z));
+
+        if (!result.iterator().hasNext()) {
+            return true;
+        }
+
+        String regionName = result.iterator().next().value();
+        Region region = regions.get(regionName);
+
+        return region.ownerId.equals(player.getUniqueId()) || player.hasPermission("worldguard.god");
     }
 
     public boolean intersectsRegion(CoordPair selection) {

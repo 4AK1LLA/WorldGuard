@@ -1,8 +1,7 @@
 package com.rustret.worldguard;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.Block;
-import cn.nukkit.level.Position;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import com.github.davidmoten.rtreemulti.Entry;
 import com.github.davidmoten.rtreemulti.RTree;
@@ -177,21 +176,8 @@ public class WorldGuardContext {
         return true;
     }
 
-    public boolean canBuild(Block block, Player player) {
-        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(block.getX(), block.getY(), block.getZ()));
-
-        if (!result.iterator().hasNext()) {
-            return true;
-        }
-
-        String regionName = result.iterator().next().value();
-        Region region = regions.get(regionName);
-
-        return region.ownerId.equals(player.getUniqueId()) || player.hasPermission("worldguard.god");
-    }
-
-    public boolean canInteract(Position position, Player player) {
-        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(position.x, position.y, position.z));
+    public boolean canInteract(Vector3 pos, Player player) {
+        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(pos.x, pos.y, pos.z));
 
         if (!result.iterator().hasNext()) {
             return true;

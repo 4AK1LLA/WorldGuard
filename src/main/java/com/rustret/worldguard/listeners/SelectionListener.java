@@ -17,7 +17,7 @@ public class SelectionListener implements Listener {
         this.context = context;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onBlockClick(PlayerInteractEvent event) {
         if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             Item item = event.getItem();

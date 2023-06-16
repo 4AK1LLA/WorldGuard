@@ -47,7 +47,6 @@ public class RegionProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        event.getPlayer().sendMessage("Protection");
         if (event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||
                 event.getAction().equals(PlayerInteractEvent.Action.LEFT_CLICK_BLOCK)) {
             Block block = event.getBlock();

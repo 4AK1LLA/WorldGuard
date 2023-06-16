@@ -3,6 +3,7 @@ package com.rustret.worldguard.listeners;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
@@ -44,8 +45,9 @@ public class RegionProtectionListener implements Listener {
         Messages.FOREIGN_RG.sendPopup(player);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
+        event.getPlayer().sendMessage("Protection");
         if (event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||
                 event.getAction().equals(PlayerInteractEvent.Action.LEFT_CLICK_BLOCK)) {
             Block block = event.getBlock();

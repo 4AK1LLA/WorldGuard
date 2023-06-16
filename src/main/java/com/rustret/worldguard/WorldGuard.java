@@ -16,7 +16,7 @@ public class WorldGuard extends PluginBase {
         getServer().getCommandMap().register("wand", new WandCommand());
         getServer().getCommandMap().register("rg", new RgCommand(context));
 
-        getServer().getPluginManager().registerEvents(new BlockClickListener(context), this);
+        getServer().getPluginManager().registerEvents(new SelectionListener(context), this);
         getServer().getPluginManager().registerEvents(new PlayerLeaveListener(context), this);
         getServer().getPluginManager().registerEvents(new RegionProtectionListener(context), this);
 

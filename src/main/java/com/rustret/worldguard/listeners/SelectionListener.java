@@ -7,7 +7,7 @@ import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.Item;
-import com.rustret.worldguard.coordinates.Coord;
+import com.rustret.worldguard.entities.Coord;
 import com.rustret.worldguard.WorldGuardContext;
 
 public class SelectionListener implements Listener {

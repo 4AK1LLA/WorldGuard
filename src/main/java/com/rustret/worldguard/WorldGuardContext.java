@@ -12,9 +12,10 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.rustret.worldguard.coordinates.Coord;
-import com.rustret.worldguard.coordinates.CoordPair;
+import com.rustret.worldguard.entities.Coord;
+import com.rustret.worldguard.entities.CoordPair;
 import com.rustret.worldguard.dbmodels.RegionModel;
+import com.rustret.worldguard.entities.Region;
 
 import java.util.HashMap;
 import java.util.List;

@@ -2,7 +2,7 @@ package com.rustret.worldguard.dbmodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.rustret.worldguard.coordinates.Coord;
+import com.rustret.worldguard.entities.Coord;
 
 @DatabaseTable(tableName = "regions")
 public class RegionModel {

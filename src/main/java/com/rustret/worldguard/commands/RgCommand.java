@@ -7,10 +7,10 @@ import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
-import com.rustret.worldguard.Region;
+import com.rustret.worldguard.entities.Region;
 import com.rustret.worldguard.WorldGuardContext;
-import com.rustret.worldguard.coordinates.Coord;
-import com.rustret.worldguard.coordinates.CoordPair;
+import com.rustret.worldguard.entities.Coord;
+import com.rustret.worldguard.entities.CoordPair;
 
 import java.util.UUID;
 import java.util.regex.Pattern;

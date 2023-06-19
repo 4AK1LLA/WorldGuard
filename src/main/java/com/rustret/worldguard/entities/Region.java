@@ -1,6 +1,4 @@
-package com.rustret.worldguard;
-
-import com.rustret.worldguard.coordinates.Coord;
+package com.rustret.worldguard.entities;
 
 import java.util.UUID;
 
@@ -9,9 +7,7 @@ public class Region {
 
     public UUID ownerId;
 
-    public Coord pos1;
-
-    public Coord pos2;
+    public Coord pos1, pos2;
 
     public Region(String ownerName, UUID ownerId, Coord pos1, Coord pos2) {
         this.ownerName = ownerName;

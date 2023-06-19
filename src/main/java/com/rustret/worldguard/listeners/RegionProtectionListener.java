@@ -7,6 +7,7 @@ import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
+import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import com.rustret.worldguard.Messages;
@@ -47,23 +48,37 @@ public class RegionProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||
-                event.getAction().equals(PlayerInteractEvent.Action.LEFT_CLICK_BLOCK)) {
-            Block block = event.getBlock();
-            Player player = event.getPlayer();
-
-            if (context.canInteract(block, player)) {
-                return;
-            }
-
-            event.setCancelled();
-            Messages.FOREIGN_RG.sendPopup(player);
+        if (!event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)) {
+            return;
         }
+
+        Block block = event.getBlock();
+        Player player = event.getPlayer();
+
+        if (context.canInteract(block, player)) {
+            return;
+        }
+
+        event.setCancelled();
+        Messages.FOREIGN_RG.sendPopup(player);
     }
 
     @EventHandler
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Block block = event.getBlockClicked();
+        Player player = event.getPlayer();
+
+        if (context.canInteract(block, player)) {
+            return;
+        }
+
+        event.setCancelled();
+        Messages.FOREIGN_RG.sendPopup(player);
+    }
+
+    @EventHandler
+    public void onItemFrameDropItem(ItemFrameDropItemEvent event) {
+        Block block = event.getBlock();
         Player player = event.getPlayer();
 
         if (context.canInteract(block, player)) {

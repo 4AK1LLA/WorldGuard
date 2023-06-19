@@ -19,26 +19,28 @@ public class SelectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onBlockClick(PlayerInteractEvent event) {
-        if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            Item item = event.getItem();
-
-            if (item.getId() != Item.WOODEN_AXE) {
-                return;
-            }
-
-            if (!item.hasCustomBlockData() || !item.getCustomBlockData().getBoolean("wand")) {
-                return;
-            }
-
-            Block block = event.getBlock();
-
-            int x = (int)block.getX();
-            int y = (int)block.getY();
-            int z = (int)block.getZ();
-            Coord coords = new Coord(x, y, z);
-            Player player = event.getPlayer();
-
-            context.setPlayerSelection(player, coords);
+        if (event.isCancelled() || !event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)) {
+            return;
         }
+
+        Item item = event.getItem();
+
+        if (item.getId() != Item.WOODEN_AXE) {
+            return;
+        }
+
+        if (!item.hasCustomBlockData() || !item.getCustomBlockData().getBoolean("wand")) {
+            return;
+        }
+
+        Block block = event.getBlock();
+
+        int x = (int)block.getX();
+        int y = (int)block.getY();
+        int z = (int)block.getZ();
+        Coord coords = new Coord(x, y, z);
+        Player player = event.getPlayer();
+
+        context.setPlayerSelection(player, coords);
     }
 }

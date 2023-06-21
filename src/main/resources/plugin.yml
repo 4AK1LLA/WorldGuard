@@ -8,3 +8,6 @@ permissions:
   worldguard.god:
     description: "Allows to delete others regions, removes region size limit"
     default: false
+  worldguard.flag:
+    description: "Gives access to /flag"
+    default: false

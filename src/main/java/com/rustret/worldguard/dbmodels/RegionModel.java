@@ -1,8 +1,8 @@
 package com.rustret.worldguard.dbmodels;
 
+import cn.nukkit.math.Vector3;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.rustret.worldguard.coordinates.Coord;
 
 @DatabaseTable(tableName = "regions")
 public class RegionModel {
@@ -14,41 +14,27 @@ public class RegionModel {
     private String regionName;
 
     @DatabaseField
-    private String ownerName;
+    private String ownerName, ownerId;
 
     @DatabaseField
-    private String ownerId;
+    private double x1, y1, z1, x2, y2, z2;
 
     @DatabaseField
-    private int x1;
-
-    @DatabaseField
-    private int y1;
-
-    @DatabaseField
-    private int z1;
-
-    @DatabaseField
-    private int x2;
-
-    @DatabaseField
-    private int y2;
-
-    @DatabaseField
-    private int z2;
+    private boolean pvp;
 
     public RegionModel() { }
 
-    public RegionModel(String regionName, String ownerName, String ownerId, Coord pos1, Coord pos2) {
+    public RegionModel(String regionName, String ownerName, String ownerId, Vector3[] coordinates, boolean pvp) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
-        this.x1 = pos1.x;
-        this.y1 = pos1.y;
-        this.z1 = pos1.z;
-        this.x2 = pos2.x;
-        this.y2 = pos2.y;
-        this.z2 = pos2.z;
+        this.x1 = coordinates[0].x;
+        this.y1 = coordinates[0].y;
+        this.z1 = coordinates[0].z;
+        this.x2 = coordinates[1].x;
+        this.y2 = coordinates[1].y;
+        this.z2 = coordinates[1].z;
+        this.pvp = pvp;
     }
 
     public String getRegionName() {
@@ -63,11 +49,11 @@ public class RegionModel {
         return ownerId;
     }
 
-    public Coord getPos1() {
-        return new Coord(x1, y1, z1);
+    public Vector3[] getCoordinates() {
+        return new Vector3[] { new Vector3(x1, y1, z1), new Vector3(x2, y2, z2) };
     }
 
-    public Coord getPos2() {
-        return new Coord(x2, y2, z2);
+    public boolean getPvp() {
+        return pvp;
     }
 }

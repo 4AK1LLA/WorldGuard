@@ -6,12 +6,12 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.math.Vector3;
 import com.rustret.worldguard.Messages;
-import com.rustret.worldguard.Region;
+import com.rustret.worldguard.entities.Region;
 import com.rustret.worldguard.WorldGuardContext;
-import com.rustret.worldguard.coordinates.Coord;
-import com.rustret.worldguard.coordinates.CoordPair;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class RgCommand extends Command {
@@ -19,10 +19,9 @@ public class RgCommand extends Command {
 
     public RgCommand(WorldGuardContext context) {
         super("rg", "Создание и редактирование регионов", "/rg");
+        commandParameters.clear();
 
         this.context = context;
-
-        commandParameters.clear();
 
         commandParameters.put("helpCommand", new CommandParameter[] {
                 CommandParameter.newEnum("helpParameter", new CommandEnum("helpOption", "help"))
@@ -38,10 +37,10 @@ public class RgCommand extends Command {
                 CommandParameter.newType("regionName", CommandParamType.STRING)
         });
 
-        commandParameters.put("addmemberCommand", new CommandParameter[] {
-                CommandParameter.newEnum("addmemberParameter", new CommandEnum("addmemberOption", "addmember")),
-                CommandParameter.newType("player", CommandParamType.TARGET)
-        });
+//        commandParameters.put("addmemberCommand", new CommandParameter[] {
+//                CommandParameter.newEnum("addmemberParameter", new CommandEnum("addmemberOption", "addmember")),
+//                CommandParameter.newType("player", CommandParamType.TARGET)
+//        });
     }
 
     @Override
@@ -91,31 +90,40 @@ public class RgCommand extends Command {
         }
 
         Player player = (Player)sender;
-        CoordPair selection = context.getPlayerSelection(player);
+        Vector3[] selection = context.getSelection(player);
 
-        if (selection == null || selection.pos1 == null || selection.pos2 == null) {
+        if (selection == null || selection[0] == null || selection[1] == null) {
             Messages.MISSIING_SELECTION.send(sender);
             return true;
         }
 
-        int xLength = Math.abs(selection.pos2.x - selection.pos1.x) + 1;
-        int yLength = Math.abs(selection.pos2.y - selection.pos1.y) + 1;
-        int zLength = Math.abs(selection.pos2.z - selection.pos1.z) + 1;
+        int xLength = (int) (Math.abs(selection[1].x - selection[0].x) + 1);
+        int yLength = (int) (Math.abs(selection[1].y - selection[0].y) + 1);
+        int zLength = (int) (Math.abs(selection[1].z - selection[0].z) + 1);
 
         //TODO: Add all limits to config
         if (!player.hasPermission("worldguard.god") && (xLength > 50 || yLength > 50 || zLength > 50)) {
+            context.removePlayerSelection(player);
             Messages.RG_SIDE_LIMIT.send(sender);
             return true;
         }
 
         int regionSize = xLength * yLength * zLength;
         if (!player.hasPermission("worldguard.god") && regionSize > 50000) {
+            context.removePlayerSelection(player);
             Messages.RG_SIZE_LIMIT.send(sender);
             return true;
         }
 
         if (context.getRegion(regionName) != null) {
             Messages.RG_EXIST.send(sender, regionName);
+            return true;
+        }
+
+        UUID ownerId = player.getUniqueId();
+        if (!player.hasPermission("worldguard.god") && context.getPlayerRegionsCount(ownerId) >= 2) {
+            context.removePlayerSelection(player);
+            Messages.RG_COUNT_LIMIT.send(sender);
             return true;
         }
 
@@ -126,18 +134,15 @@ public class RgCommand extends Command {
         }
 
         String ownerName = player.getName();
-        String ownerId = player.getUniqueId().toString();
-        Coord pos1 = new Coord(selection.pos1.x, selection.pos1.y, selection.pos1.z);
-        Coord pos2 = new Coord(selection.pos2.x, selection.pos2.y, selection.pos2.z);
-        Region region = new Region(ownerName, ownerId, pos1, pos2);
+        Region region = new Region(regionName, ownerName, ownerId, selection);
 
-        if (context.addRegion(regionName, region)) {
-            context.removePlayerSelection(player);
-            Messages.RG_CLAIM.send(sender, regionName, regionSize);
-            return true;
+        if (!context.addRegion(regionName, region)) {
+            return false;
         }
 
-        return false;
+        context.removePlayerSelection(player);
+        Messages.RG_CLAIM.send(sender, regionName, regionSize);
+        return true;
     }
 
     private boolean delete(CommandSender sender, String[] args) {
@@ -170,18 +175,18 @@ public class RgCommand extends Command {
 
         Player player = (Player)sender;
 
-        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId().toString());
+        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId());
         if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
             Messages.RG_NOT_OWNER.send(sender);
             return false;
         }
 
-        if (context.removeRegion(regionName)) {
-            Messages.RG_DELETE.send(sender, regionName);
-            return true;
+        if (!context.removeRegion(regionName)) {
+            return false;
         }
 
-        return false;
+        Messages.RG_DELETE.send(sender, regionName);
+        return true;
     }
 
     private boolean help(CommandSender sender, String[] args) {

@@ -24,7 +24,11 @@ public enum Messages {
     RG_NOT_EXIST ("§c\u2718 Региона с названием §f%s§c не существует"),
     RG_NOT_OWNER ("§c\u2718 Вы не являетесь владельцем этого региона"),
     RG_DELETE ("§a\u2714 Регион §f%s§a был успешно удален"),
-    RG_INTERSECT ("§c\u2718 Ваш регион пересекается с другими регионами"),
+    RG_INTERSECT ("§c\u2718 Ваш регион пересекается с другим регионом"),
+    FOREIGN_RG ("§cЭто чужой регион"),
+    RG_COUNT_LIMIT ("§c\u2718 Вы достигли ограничения по количеству регионов"),
+    FLAG_INVALID ("§c\u2718 Флаг §f%s§c не существует"),
+    FLAG_SUCCESS ("§a\u2714 Значение флага §f%s§a для региона §f%s§a успешно изменено на §f%s"),
     RG_HELP ("§f/wand§a - получить топорик для создания региона\n" +
             "§f/rg claim [название региона]§a - создать регион\n" +
             "§f/rg delete [название региона]§a - удалить регион\n" +
@@ -43,5 +47,9 @@ public enum Messages {
 
     public void send(Player player, Object... args) {
         player.sendMessage(String.format(message, args));
+    }
+
+    public void sendPopup(Player player) {
+        player.sendPopup(message);
     }
 }

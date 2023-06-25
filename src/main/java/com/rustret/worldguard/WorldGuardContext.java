@@ -14,20 +14,18 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.rustret.worldguard.dbmodels.RegionModel;
 import com.rustret.worldguard.entities.Region;
+import com.rustret.worldguard.rtree.RegionRTree;
 
 import java.util.*;
 
 
 public class WorldGuardContext {
     private final String connectionString;
-    private final Map<Long, Vector3[]> selections;
-    private final Map<String, Region> regions;
-    private RTree<String, Rectangle> rtree;
+    private final Map<Long, Vector3[]> selections = new HashMap<>();
+    private final Map<String, Region> regions = new HashMap<>();
+    private RegionRTree rtree = new RegionRTree();
 
     WorldGuardContext(Config config) {
-        selections = new HashMap<>();
-        regions = new HashMap<>();
-        rtree = RTree.dimensions(3).create();
         connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
                 config.get("MySql.host"), (int)config.get("MySql.port"), config.get("MySql.database"),
                 config.get("MySql.username"), config.get("MySql.password"));
@@ -55,7 +53,7 @@ public class WorldGuardContext {
 
                 Region region = new Region(regionName, model.getOwnerName(), UUID.fromString(model.getOwnerId()), coordinates);
                 regions.put(regionName, region);
-                rtree = rtree.add(regionName, createRectangle(coordinates));
+                rtree.put(regionName, coordinates);
             }
         }
         catch (Exception e) {
@@ -90,18 +88,6 @@ public class WorldGuardContext {
         catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private Rectangle createRectangle(Vector3[] coordinates) {
-        double minX = Math.min(coordinates[0].x, coordinates[1].x);
-        double minY = Math.min(coordinates[0].y, coordinates[1].y);
-        double minZ = Math.min(coordinates[0].z, coordinates[1].z);
-
-        double maxX = Math.max(coordinates[0].x, coordinates[1].x);
-        double maxY = Math.max(coordinates[0].y, coordinates[1].y);
-        double maxZ = Math.max(coordinates[0].z, coordinates[1].z);
-
-        return Rectangle.create(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public Vector3[] getSelection(Player player) {
@@ -144,7 +130,7 @@ public class WorldGuardContext {
 
     public boolean addRegion(String regionName, Region region) {
         regions.put(regionName, region);
-        rtree = rtree.add(regionName, createRectangle(region.coordinates));
+        rtree.put(regionName, region.coordinates);
 
         return true;
     }
@@ -155,28 +141,20 @@ public class WorldGuardContext {
 
     public boolean removeRegion(String regionName) {
         Region removedRg = regions.remove(regionName);
-        rtree = rtree.delete(regionName, createRectangle(removedRg.coordinates));
+        rtree.remove(regionName, removedRg.coordinates);
 
         return true;
     }
 
-    public boolean canInteract(Vector3 pos, Player player) {
-        Iterable<Entry<String, Rectangle>> result = rtree.search(Point.create(pos.x, pos.y, pos.z));
-
-        if (!result.iterator().hasNext()) {
-            return true;
-        }
-
-        String regionName = result.iterator().next().value();
+    public boolean canInteract(Vector3 point, Player player) {
+        String regionName = rtree.findRegionName(point);
         Region region = regions.get(regionName);
 
         return region.ownerId.equals(player.getUniqueId()) || player.hasPermission("worldguard.god");
     }
 
     public boolean intersectsRegion(Vector3[] coordinates) {
-        Iterable<Entry<String, Rectangle>> result = rtree.search(createRectangle(coordinates));
-
-        return result.iterator().hasNext();
+        return rtree.intersects(coordinates);
     }
 
     public int getRegionsCount() {

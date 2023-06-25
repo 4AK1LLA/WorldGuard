@@ -206,4 +206,13 @@ public class WorldGuardContext {
                 .filter(region -> region.ownerId.equals(playerId))
                 .count();
     }
+
+    public boolean regionExists(String regionName) {
+        return getRegion(regionName) != null;
+    }
+
+    public void updateFlag(String regionName, String flag, boolean value) {
+        Region region = getRegion(regionName);
+        region.setFlag(flag, value);
+    }
 }

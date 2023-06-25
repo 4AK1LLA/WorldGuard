@@ -7,27 +7,22 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
 import com.rustret.worldguard.WorldGuardContext;
-import com.rustret.worldguard.entities.Flag;
-import com.rustret.worldguard.entities.Region;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 public class FlagCommand extends Command {
     private final WorldGuardContext context;
-    private final Map<String, Flag> flags = new HashMap<>();
+    private final String[] flags = { "pvp" };
 
     public FlagCommand(WorldGuardContext context) {
         super("flag", "Установить значение определенного флага для региона", "/flag");
         this.context = context;
         setPermission("worldguard.flag");
 
-        flags.put("pvp", Flag.PVP);
-
         commandParameters.clear();
         commandParameters.put("flag", new CommandParameter[] {
                 CommandParameter.newType("region", CommandParamType.STRING),
-                CommandParameter.newEnum("flag", new CommandEnum("flags", flags.keySet().toArray(new String[0]))),
+                CommandParameter.newEnum("flag", new CommandEnum("flags", flags)),
                 CommandParameter.newEnum("value", new CommandEnum("values", "allow", "deny")),
         });
     }
@@ -44,32 +39,31 @@ public class FlagCommand extends Command {
         }
 
         String regionName = args[0];
-        Region region = context.getRegion(regionName);
-        if (region == null) {
+        String flag = args[1];
+        String value = args[2];
+
+        if (!context.regionExists(regionName)) {
             Messages.RG_NOT_EXIST.send(sender, regionName);
             return true;
         }
 
-        Flag flag = flags.get(args[1]);
-        if (flag == null) {
+        if (!Arrays.asList(flags).contains(flag)) {
             Messages.FLAG_INVALID.send(sender, args[1]);
             return true;
         }
 
-        switch (args[2]) {
-            case "allow":
-                if (!region.flags.contains(flag)) {
-                    region.flags.add(flag);
-                }
-                Messages.FLAG_SUCCESS.send(sender, args[1], regionName, "allow");
-                return true;
-            case "deny":
-                region.flags.remove(flag);
-                Messages.FLAG_SUCCESS.send(sender, args[1], regionName, "deny");
-                return true;
-            default:
-                Messages.WRONG_SYNTAX.send(sender, "/flag [регион] [флаг] [allow/deny]");
-                return true;
+        if (value.equals("allow")) {
+            context.updateFlag(regionName, flag, true);
+            Messages.FLAG_SUCCESS.send(sender, flag, regionName, "allow");
+            return true;
         }
+
+        if (value.equals("deny")) {
+            context.updateFlag(regionName, flag, false);
+            Messages.FLAG_SUCCESS.send(sender, flag, regionName, "deny");
+            return true;
+        }
+
+        return false;
     }
 }

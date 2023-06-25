@@ -117,14 +117,14 @@ public class WorldGuardContext {
         if (selection == null) {
             selection = new Vector3[] { point, null };
 
-            Messages.FIRST_POS.send(player, point.x, point.y, point.z);
+            Messages.FIRST_POS.send(player, (int) point.x, (int) point.y, (int) point.z);
         }
 
         //Init pos2
         else if (selection[1] == null) {
             selection[1] = point;
 
-            Messages.SECOND_POS.send(player, point.x, point.y, point.z);
+            Messages.SECOND_POS.send(player, (int) point.x, (int) point.y, (int) point.z);
         }
 
         //Reset selection and init pos1
@@ -132,7 +132,7 @@ public class WorldGuardContext {
             selection[0] = point;
             selection[1] = null;
 
-            Messages.FIRST_POS.send(player, point.x, point.y, point.z);
+            Messages.FIRST_POS.send(player, (int) point.x, (int) point.y, (int) point.z);
         }
 
         selections.put(playerId, selection);

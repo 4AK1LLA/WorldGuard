@@ -120,16 +120,16 @@ public class RgCommand extends Command {
             return true;
         }
 
-        if (context.intersectsRegion(selection)) {
-            context.removePlayerSelection(player);
-            Messages.RG_INTERSECT.send(sender);
-            return true;
-        }
-
         UUID ownerId = player.getUniqueId();
         if (!player.hasPermission("worldguard.god") && context.getPlayerRegionsCount(ownerId) >= 2) {
             context.removePlayerSelection(player);
             Messages.RG_COUNT_LIMIT.send(sender);
+            return true;
+        }
+
+        if (context.intersectsRegion(selection)) {
+            context.removePlayerSelection(player);
+            Messages.RG_INTERSECT.send(sender);
             return true;
         }
 

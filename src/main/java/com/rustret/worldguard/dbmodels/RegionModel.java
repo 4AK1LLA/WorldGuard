@@ -14,32 +14,17 @@ public class RegionModel {
     private String regionName;
 
     @DatabaseField
-    private String ownerName;
+    private String ownerName, ownerId;
 
     @DatabaseField
-    private String ownerId;
+    private int x1, y1, z1, x2, y2, z2;
 
     @DatabaseField
-    private int x1;
-
-    @DatabaseField
-    private int y1;
-
-    @DatabaseField
-    private int z1;
-
-    @DatabaseField
-    private int x2;
-
-    @DatabaseField
-    private int y2;
-
-    @DatabaseField
-    private int z2;
+    private boolean pvp;
 
     public RegionModel() { }
 
-    public RegionModel(String regionName, String ownerName, String ownerId, Coord pos1, Coord pos2) {
+    public RegionModel(String regionName, String ownerName, String ownerId, Coord pos1, Coord pos2, boolean pvp) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
@@ -49,6 +34,7 @@ public class RegionModel {
         this.x2 = pos2.x;
         this.y2 = pos2.y;
         this.z2 = pos2.z;
+        this.pvp = pvp;
     }
 
     public String getRegionName() {
@@ -69,5 +55,9 @@ public class RegionModel {
 
     public Coord getPos2() {
         return new Coord(x2, y2, z2);
+    }
+
+    public boolean getPvp() {
+        return pvp;
     }
 }

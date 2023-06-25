@@ -5,12 +5,13 @@ import com.rustret.worldguard.commands.*;
 import com.rustret.worldguard.listeners.*;
 
 public class WorldGuard extends PluginBase {
+    private WorldGuardContext context;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
-        WorldGuardContext context = new WorldGuardContext(getConfig());
+        context = new WorldGuardContext(getConfig());
         getLogger().info("Number of loaded regions - " + context.getRegionsCount());
 
         getServer().getCommandMap().register("wand", new WandCommand());
@@ -26,6 +27,8 @@ public class WorldGuard extends PluginBase {
 
     @Override
     public void onDisable() {
+        context.saveDatabase();
+
         getLogger().info("Plugin Disabled");
     }
 }

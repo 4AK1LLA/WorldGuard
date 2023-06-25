@@ -137,7 +137,7 @@ public class RgCommand extends Command {
         String ownerName = player.getName();
         Coord pos1 = new Coord(selection.pos1.x, selection.pos1.y, selection.pos1.z);
         Coord pos2 = new Coord(selection.pos2.x, selection.pos2.y, selection.pos2.z);
-        Region region = new Region(ownerName, ownerId, pos1, pos2);
+        Region region = new Region(regionName, ownerName, ownerId, pos1, pos2);
 
         if (!context.addRegion(regionName, region)) {
             return false;

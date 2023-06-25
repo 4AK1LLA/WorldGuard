@@ -3,7 +3,7 @@ package com.rustret.worldguard.entities;
 import java.util.UUID;
 
 public class Region {
-    public String ownerName;
+    public String regionName, ownerName;
 
     public UUID ownerId;
 
@@ -11,7 +11,8 @@ public class Region {
 
     public boolean pvp;
 
-    public Region(String ownerName, UUID ownerId, Coord pos1, Coord pos2) {
+    public Region(String regionName, String ownerName, UUID ownerId, Coord pos1, Coord pos2) {
+        this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
         this.pos1 = pos1;

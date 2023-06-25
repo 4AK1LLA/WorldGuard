@@ -7,7 +7,7 @@ import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.Item;
-import com.rustret.worldguard.entities.Coord;
+import cn.nukkit.math.Vector3;
 import com.rustret.worldguard.WorldGuardContext;
 
 public class SelectionListener implements Listener {
@@ -18,7 +18,7 @@ public class SelectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onBlockClick(PlayerInteractEvent event) {
+    public void onWandSelect(PlayerInteractEvent event) {
         if (event.isCancelled() || !event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)) {
             return;
         }
@@ -34,13 +34,9 @@ public class SelectionListener implements Listener {
         }
 
         Block block = event.getBlock();
-
-        int x = (int)block.getX();
-        int y = (int)block.getY();
-        int z = (int)block.getZ();
-        Coord coords = new Coord(x, y, z);
+        Vector3 point = new Vector3(block.getX(), block.getY(), block.getZ());
         Player player = event.getPlayer();
 
-        context.setPlayerSelection(player, coords);
+        context.setSelection(player, point);
     }
 }

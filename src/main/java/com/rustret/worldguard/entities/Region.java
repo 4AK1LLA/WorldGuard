@@ -1,5 +1,7 @@
 package com.rustret.worldguard.entities;
 
+import cn.nukkit.math.Vector3;
+
 import java.util.UUID;
 
 public class Region {
@@ -7,16 +9,15 @@ public class Region {
 
     public UUID ownerId;
 
-    public Coord pos1, pos2;
+    public Vector3[] coordinates;
 
     public boolean pvp;
 
-    public Region(String regionName, String ownerName, UUID ownerId, Coord pos1, Coord pos2) {
+    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
-        this.pos1 = pos1;
-        this.pos2 = pos2;
+        this.coordinates = coordinates;
         pvp = true;
     }
 

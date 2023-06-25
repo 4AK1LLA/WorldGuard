@@ -6,11 +6,10 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.math.Vector3;
 import com.rustret.worldguard.Messages;
 import com.rustret.worldguard.entities.Region;
 import com.rustret.worldguard.WorldGuardContext;
-import com.rustret.worldguard.entities.Coord;
-import com.rustret.worldguard.entities.CoordPair;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -91,16 +90,16 @@ public class RgCommand extends Command {
         }
 
         Player player = (Player)sender;
-        CoordPair selection = context.getPlayerSelection(player);
+        Vector3[] selection = context.getSelection(player);
 
-        if (selection == null || selection.pos1 == null || selection.pos2 == null) {
+        if (selection == null || selection[0] == null || selection[1] == null) {
             Messages.MISSIING_SELECTION.send(sender);
             return true;
         }
 
-        int xLength = Math.abs(selection.pos2.x - selection.pos1.x) + 1;
-        int yLength = Math.abs(selection.pos2.y - selection.pos1.y) + 1;
-        int zLength = Math.abs(selection.pos2.z - selection.pos1.z) + 1;
+        int xLength = (int) (Math.abs(selection[1].x - selection[0].x) + 1);
+        int yLength = (int) (Math.abs(selection[1].y - selection[0].y) + 1);
+        int zLength = (int) (Math.abs(selection[1].z - selection[0].z) + 1);
 
         //TODO: Add all limits to config
         if (!player.hasPermission("worldguard.god") && (xLength > 50 || yLength > 50 || zLength > 50)) {
@@ -135,9 +134,7 @@ public class RgCommand extends Command {
         }
 
         String ownerName = player.getName();
-        Coord pos1 = new Coord(selection.pos1.x, selection.pos1.y, selection.pos1.z);
-        Coord pos2 = new Coord(selection.pos2.x, selection.pos2.y, selection.pos2.z);
-        Region region = new Region(regionName, ownerName, ownerId, pos1, pos2);
+        Region region = new Region(regionName, ownerName, ownerId, selection);
 
         if (!context.addRegion(regionName, region)) {
             return false;

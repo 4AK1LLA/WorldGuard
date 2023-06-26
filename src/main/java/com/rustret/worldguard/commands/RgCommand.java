@@ -90,7 +90,7 @@ public class RgCommand extends Command {
         }
 
         Player player = (Player)sender;
-        Vector3[] selection = context.getSelection(player);
+        Vector3[] selection = context.getSelection(player.getId());
 
         if (selection == null || selection[0] == null || selection[1] == null) {
             Messages.MISSIING_SELECTION.send(sender);

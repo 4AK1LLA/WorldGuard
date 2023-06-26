@@ -3,10 +3,6 @@ package com.rustret.worldguard;
 import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
-import com.github.davidmoten.rtreemulti.Entry;
-import com.github.davidmoten.rtreemulti.RTree;
-import com.github.davidmoten.rtreemulti.geometry.Point;
-import com.github.davidmoten.rtreemulti.geometry.Rectangle;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -90,37 +86,11 @@ public class WorldGuardContext {
         }
     }
 
-    public Vector3[] getSelection(Player player) {
-        return selections.get(player.getId());
+    public Vector3[] getSelection(long playerId) {
+        return selections.get(playerId);
     }
 
-    public void setSelection(Player player, Vector3 point) {
-        long playerId = player.getId();
-
-        Vector3[] selection = selections.get(playerId);
-
-        //Init selection and pos1
-        if (selection == null) {
-            selection = new Vector3[] { point, null };
-
-            Messages.FIRST_POS.send(player, (int) point.x, (int) point.y, (int) point.z);
-        }
-
-        //Init pos2
-        else if (selection[1] == null) {
-            selection[1] = point;
-
-            Messages.SECOND_POS.send(player, (int) point.x, (int) point.y, (int) point.z);
-        }
-
-        //Reset selection and init pos1
-        else if (selection[0] != null) {
-            selection[0] = point;
-            selection[1] = null;
-
-            Messages.FIRST_POS.send(player, (int) point.x, (int) point.y, (int) point.z);
-        }
-
+    public void setSelection(long playerId, Vector3[] selection) {
         selections.put(playerId, selection);
     }
 
@@ -148,6 +118,7 @@ public class WorldGuardContext {
 
     public boolean canInteract(Vector3 point, Player player) {
         String regionName = rtree.findRegionName(point);
+        if (regionName == null) return true;
         Region region = regions.get(regionName);
 
         return region.ownerId.equals(player.getUniqueId()) || player.hasPermission("worldguard.god");

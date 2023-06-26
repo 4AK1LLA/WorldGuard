@@ -9,6 +9,7 @@ import cn.nukkit.event.Listener;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import com.rustret.worldguard.Messages;
@@ -34,7 +35,7 @@ public class RegionProtectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onRightClick(PlayerInteractEvent event) {
         if (!event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK)) {
             return;
         }
@@ -43,13 +44,27 @@ public class RegionProtectionListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
         checkProtection(event.getBlockClicked(), event.getPlayer(), event);
     }
 
     @EventHandler
-    public void onItemFrameDropItem(ItemFrameDropItemEvent event) {
+    public void onItemFrameClick(ItemFrameDropItemEvent event) {
         checkProtection(event.getBlock(), event.getPlayer(), event);
+    }
+
+    @EventHandler
+    public void onPvp(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player))
+            return;
+
+        Player damager = (Player) event.getDamager();
+        Player victim = (Player) event.getEntity();
+
+        if (!pvpAllowed(damager) || !pvpAllowed(victim)) {
+            event.setCancelled();
+            Messages.NO_PVP.sendPopup(damager);
+        }
     }
 
     private void checkProtection(Block block, Player player, Event event) {
@@ -61,5 +76,11 @@ public class RegionProtectionListener implements Listener {
 
         event.setCancelled();
         Messages.FOREIGN_RG.sendPopup(player);
+    }
+
+    private boolean pvpAllowed(Player player) {
+        String regionName = context.findRtreeRegionName(player.getPosition());
+        if (regionName == null) return true;
+        return context.getFlagValue(regionName, "pvp");
     }
 }

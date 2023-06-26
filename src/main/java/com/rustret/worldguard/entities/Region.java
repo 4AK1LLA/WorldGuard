@@ -26,4 +26,11 @@ public class Region {
             pvp = value;
         }
     }
+
+    public boolean getFlag(String flag) {
+        if (flag.equals("pvp")) {
+            return pvp;
+        }
+        throw new IllegalArgumentException("Unsupported flag: " + flag);
+    }
 }

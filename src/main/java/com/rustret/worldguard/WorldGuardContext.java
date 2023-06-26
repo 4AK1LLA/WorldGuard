@@ -143,4 +143,9 @@ public class WorldGuardContext {
         Region region = getRegion(regionName);
         region.setFlag(flag, value);
     }
+
+    public boolean getFlagValue(String regionName, String flag) {
+        Region region = getRegion(regionName);
+        return region.getFlag(flag);
+    }
 }

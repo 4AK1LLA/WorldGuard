@@ -1,6 +1,5 @@
 package com.rustret.worldguard.listeners;
 
-import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerQuitEvent;
@@ -16,15 +15,11 @@ public class PlayerLeaveListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-
-        context.removePlayerSelection(player);
+        context.removeSelection(event.getPlayer().getId());
     }
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        Player player = event.getPlayer();
-
-        context.removePlayerSelection(player);
+        context.removeSelection(event.getPlayer().getId());
     }
 }

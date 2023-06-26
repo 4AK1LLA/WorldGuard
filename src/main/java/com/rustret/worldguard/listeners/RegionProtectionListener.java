@@ -2,6 +2,7 @@ package com.rustret.worldguard.listeners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.event.Event;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
@@ -13,6 +14,8 @@ import cn.nukkit.event.player.PlayerInteractEvent;
 import com.rustret.worldguard.Messages;
 import com.rustret.worldguard.WorldGuardContext;
 
+import java.util.UUID;
+
 public class RegionProtectionListener implements Listener {
     private final WorldGuardContext context;
 
@@ -22,28 +25,12 @@ public class RegionProtectionListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        Block block = event.getBlock();
-        Player player = event.getPlayer();
-
-        if (context.canInteract(block, player)) {
-            return;
-        }
-
-        event.setCancelled();
-        Messages.FOREIGN_RG.sendPopup(player);
+        checkProtection(event.getBlock(), event.getPlayer(), event);
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        Block block = event.getBlock();
-        Player player = event.getPlayer();
-
-        if (context.canInteract(block, player)) {
-            return;
-        }
-
-        event.setCancelled();
-        Messages.FOREIGN_RG.sendPopup(player);
+        checkProtection(event.getBlock(), event.getPlayer(), event);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -52,38 +39,25 @@ public class RegionProtectionListener implements Listener {
             return;
         }
 
-        Block block = event.getBlock();
-        Player player = event.getPlayer();
-
-        if (context.canInteract(block, player)) {
-            return;
-        }
-
-        event.setCancelled();
-        Messages.FOREIGN_RG.sendPopup(player);
+        checkProtection(event.getBlock(), event.getPlayer(), event);
     }
 
     @EventHandler
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
-        Block block = event.getBlockClicked();
-        Player player = event.getPlayer();
-
-        if (context.canInteract(block, player)) {
-            return;
-        }
-
-        event.setCancelled();
-        Messages.FOREIGN_RG.sendPopup(player);
+        checkProtection(event.getBlockClicked(), event.getPlayer(), event);
     }
 
     @EventHandler
     public void onItemFrameDropItem(ItemFrameDropItemEvent event) {
-        Block block = event.getBlock();
-        Player player = event.getPlayer();
+        checkProtection(event.getBlock(), event.getPlayer(), event);
+    }
 
-        if (context.canInteract(block, player)) {
-            return;
-        }
+    private void checkProtection(Block block, Player player, Event event) {
+        String regionName = context.findRtreeRegionName(block);
+        if (regionName == null) return;
+
+        UUID id = context.getRegionOwnerId(regionName);
+        if (id.equals(player.getUniqueId()) || player.hasPermission("worldguard.god")) return;
 
         event.setCancelled();
         Messages.FOREIGN_RG.sendPopup(player);

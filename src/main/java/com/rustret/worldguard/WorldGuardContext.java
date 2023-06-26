@@ -1,6 +1,5 @@
 package com.rustret.worldguard;
 
-import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import com.j256.ormlite.dao.Dao;
@@ -19,7 +18,7 @@ public class WorldGuardContext {
     private final String connectionString;
     private final Map<Long, Vector3[]> selections = new HashMap<>();
     private final Map<String, Region> regions = new HashMap<>();
-    private RegionRTree rtree = new RegionRTree();
+    private final RegionRTree rtree = new RegionRTree();
 
     WorldGuardContext(Config config) {
         connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
@@ -94,34 +93,31 @@ public class WorldGuardContext {
         selections.put(playerId, selection);
     }
 
-    public void removePlayerSelection(Player player) {
-        selections.remove(player.getId());
+    public void removeSelection(long playerId) {
+        selections.remove(playerId);
     }
 
-    public boolean addRegion(String regionName, Region region) {
+    public void addRegion(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
+        Region region = new Region(regionName, ownerName, ownerId, coordinates);
         regions.put(regionName, region);
-        rtree.put(regionName, region.coordinates);
-
-        return true;
+        rtree.put(regionName, coordinates);
     }
 
     public Region getRegion(String regionName) {
         return regions.get(regionName);
     }
 
-    public boolean removeRegion(String regionName) {
+    public void removeRegion(String regionName) {
         Region removedRg = regions.remove(regionName);
         rtree.remove(regionName, removedRg.coordinates);
-
-        return true;
     }
 
-    public boolean canInteract(Vector3 point, Player player) {
-        String regionName = rtree.findRegionName(point);
-        if (regionName == null) return true;
-        Region region = regions.get(regionName);
+    public String findRtreeRegionName(Vector3 point) {
+        return rtree.findRegionName(point);
+    }
 
-        return region.ownerId.equals(player.getUniqueId()) || player.hasPermission("worldguard.god");
+    public UUID getRegionOwnerId(String regionName) {
+        return regions.get(regionName).ownerId;
     }
 
     public boolean intersectsRegion(Vector3[] coordinates) {

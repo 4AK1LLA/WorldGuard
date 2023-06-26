@@ -103,14 +103,14 @@ public class RgCommand extends Command {
 
         //TODO: Add all limits to config
         if (!player.hasPermission("worldguard.god") && (xLength > 50 || yLength > 50 || zLength > 50)) {
-            context.removePlayerSelection(player);
+            context.removeSelection(player.getId());
             Messages.RG_SIDE_LIMIT.send(sender);
             return true;
         }
 
         int regionSize = xLength * yLength * zLength;
         if (!player.hasPermission("worldguard.god") && regionSize > 50000) {
-            context.removePlayerSelection(player);
+            context.removeSelection(player.getId());
             Messages.RG_SIZE_LIMIT.send(sender);
             return true;
         }
@@ -122,25 +122,20 @@ public class RgCommand extends Command {
 
         UUID ownerId = player.getUniqueId();
         if (!player.hasPermission("worldguard.god") && context.getPlayerRegionsCount(ownerId) >= 2) {
-            context.removePlayerSelection(player);
+            context.removeSelection(player.getId());
             Messages.RG_COUNT_LIMIT.send(sender);
             return true;
         }
 
         if (context.intersectsRegion(selection)) {
-            context.removePlayerSelection(player);
+            context.removeSelection(player.getId());
             Messages.RG_INTERSECT.send(sender);
             return true;
         }
 
-        String ownerName = player.getName();
-        Region region = new Region(regionName, ownerName, ownerId, selection);
+        context.addRegion(regionName, player.getName(), ownerId, selection);
+        context.removeSelection(player.getId());
 
-        if (!context.addRegion(regionName, region)) {
-            return false;
-        }
-
-        context.removePlayerSelection(player);
         Messages.RG_CLAIM.send(sender, regionName, regionSize);
         return true;
     }
@@ -181,10 +176,7 @@ public class RgCommand extends Command {
             return false;
         }
 
-        if (!context.removeRegion(regionName)) {
-            return false;
-        }
-
+        context.removeRegion(regionName);
         Messages.RG_DELETE.send(sender, regionName);
         return true;
     }

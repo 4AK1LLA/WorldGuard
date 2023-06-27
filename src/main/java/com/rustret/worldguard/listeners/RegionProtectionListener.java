@@ -61,10 +61,11 @@ public class RegionProtectionListener implements Listener {
         Player damager = (Player) event.getDamager();
         Player victim = (Player) event.getEntity();
 
-        if (!pvpAllowed(damager) || !pvpAllowed(victim)) {
-            event.setCancelled();
-            Messages.NO_PVP.sendPopup(damager);
-        }
+        if (pvpAllowed(damager) && pvpAllowed(victim))
+            return;
+
+        event.setCancelled();
+        Messages.NO_PVP.sendPopup(damager);
     }
 
     private void checkProtection(Block block, Player player, Event event) {

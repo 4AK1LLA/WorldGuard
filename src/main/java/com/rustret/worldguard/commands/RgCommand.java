@@ -115,7 +115,7 @@ public class RgCommand extends Command {
             return true;
         }
 
-        if (context.getRegion(regionName) != null) {
+        if (context.regionExists(regionName)) {
             Messages.RG_EXIST.send(sender, regionName);
             return true;
         }
@@ -161,16 +161,14 @@ public class RgCommand extends Command {
             return true;
         }
 
-        Region region = context.getRegion(regionName);
-
-        if (region == null) {
+        if (!context.regionExists(regionName)) {
             Messages.RG_NOT_EXIST.send(sender, regionName);
             return false;
         }
 
         Player player = (Player)sender;
 
-        boolean ownerIsValid = region.ownerId.equals(player.getUniqueId());
+        boolean ownerIsValid = context.getRegionOwnerId(regionName).equals(player.getUniqueId());
         if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
             Messages.RG_NOT_OWNER.send(sender);
             return false;

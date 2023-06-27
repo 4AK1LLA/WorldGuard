@@ -12,12 +12,14 @@ import com.rustret.worldguard.entities.Region;
 import com.rustret.worldguard.rtree.RegionRTree;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class WorldGuardContext {
     private final String connectionString;
     private final Map<Long, Vector3[]> selections = new HashMap<>();
-    private final Map<String, Region> regions = new HashMap<>();
+    private final Map<String, AtomicReference<Region>> regions = new HashMap<>();
+    private final Map<UUID, List<AtomicReference<Region>>> playerRegions = new HashMap<>();
     private final RegionRTree rtree = new RegionRTree();
 
     WorldGuardContext(Config config) {
@@ -29,26 +31,25 @@ public class WorldGuardContext {
     }
 
     public void loadDatabase() {
-        try {
-            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
+        try (ConnectionSource connectionSource = new JdbcConnectionSource(connectionString)) {
             TableUtils.createTableIfNotExists(connectionSource, RegionModel.class);
 
             Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
             List<RegionModel> models = dao.queryForAll();
 
-            connectionSource.close();
-
-            if (models.size() == 0) {
-                return;
-            }
+            if (models.isEmpty()) return;
 
             for (RegionModel model: models) {
                 String regionName = model.getRegionName();
                 Vector3[] coordinates = model.getCoordinates();
+                UUID ownerId = UUID.fromString(model.getOwnerId());
 
-                Region region = new Region(regionName, model.getOwnerName(), UUID.fromString(model.getOwnerId()), coordinates);
-                regions.put(regionName, region);
+                Region region = new Region(regionName, model.getOwnerName(), ownerId, coordinates);
+                AtomicReference<Region> reference = new AtomicReference<>(region);
+
+                regions.put(regionName, reference);
                 rtree.put(regionName, coordinates);
+                playerRegions.computeIfAbsent(ownerId, k -> new ArrayList<>()).add(reference);
             }
         }
         catch (Exception e) {
@@ -57,17 +58,15 @@ public class WorldGuardContext {
     }
 
     public void saveDatabase() {
-        try {
-            ConnectionSource connectionSource = new JdbcConnectionSource(connectionString);
+        try (ConnectionSource connectionSource = new JdbcConnectionSource(connectionString)) {
             TableUtils.clearTable(connectionSource, RegionModel.class);
             Dao<RegionModel, Integer> dao = DaoManager.createDao(connectionSource, RegionModel.class);
 
-            if (regions.size() == 0) {
-                return;
-            }
+            if (regions.isEmpty()) return;
 
             List<RegionModel> models = new ArrayList<>();
-            for (Region region: regions.values()) {
+            for (AtomicReference<Region> reference: regions.values()) {
+                Region region = reference.get();
                 RegionModel model = new RegionModel(
                         region.regionName,
                         region.ownerName,
@@ -99,17 +98,17 @@ public class WorldGuardContext {
 
     public void addRegion(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
         Region region = new Region(regionName, ownerName, ownerId, coordinates);
-        regions.put(regionName, region);
+        AtomicReference<Region> reference = new AtomicReference<>(region);
+        regions.put(regionName, reference);
         rtree.put(regionName, coordinates);
-    }
-
-    public Region getRegion(String regionName) {
-        return regions.get(regionName);
+        playerRegions.computeIfAbsent(ownerId, k -> new ArrayList<>()).add(reference);
     }
 
     public void removeRegion(String regionName) {
-        Region removedRg = regions.remove(regionName);
-        rtree.remove(regionName, removedRg.coordinates);
+        AtomicReference<Region> reference = regions.remove(regionName);
+        Region region = reference.get();
+        rtree.remove(regionName, region.coordinates);
+        playerRegions.get(region.ownerId).removeIf(ref -> ref.get() == region);
     }
 
     public String findRtreeRegionName(Vector3 point) {
@@ -117,7 +116,7 @@ public class WorldGuardContext {
     }
 
     public UUID getRegionOwnerId(String regionName) {
-        return regions.get(regionName).ownerId;
+        return regions.get(regionName).get().ownerId;
     }
 
     public boolean intersectsRegion(Vector3[] coordinates) {
@@ -128,24 +127,21 @@ public class WorldGuardContext {
         return regions.size();
     }
 
-    public long getPlayerRegionsCount(UUID playerId) {
-        return regions.values()
-                .stream()
-                .filter(region -> region.ownerId.equals(playerId))
-                .count();
+    public int getPlayerRegionsCount(UUID playerId) {
+        return playerRegions.getOrDefault(playerId, Collections.emptyList()).size();
     }
 
     public boolean regionExists(String regionName) {
-        return getRegion(regionName) != null;
+        return regions.containsKey(regionName);
     }
 
     public void updateFlag(String regionName, String flag, boolean value) {
-        Region region = getRegion(regionName);
+        Region region = regions.get(regionName).get();
         region.setFlag(flag, value);
     }
 
     public boolean getFlagValue(String regionName, String flag) {
-        Region region = getRegion(regionName);
+        Region region = regions.get(regionName).get();
         return region.getFlag(flag);
     }
 }

@@ -70,6 +70,8 @@ public class RgCommand extends Command {
                 return delete(sender, args);
             case "addmember":
                 return addmember(sender, args);
+            case "removemember":
+                return removemember(sender, args);
             default:
                 Messages.RG_WRONG.send(sender);
                 return true;
@@ -224,9 +226,8 @@ public class RgCommand extends Command {
         }
 
         Player player = (Player)sender;
-
-        boolean ownerIsValid = context.getRegionOwnerId(regionName).equals(player.getUniqueId());
-        if (!ownerIsValid) {
+        UUID ownerId = context.getRegionOwnerId(regionName);
+        if (!ownerId.equals(player.getUniqueId())) {
             Messages.RG_NOT_OWNER.send(sender);
             return true;
         }
@@ -243,13 +244,57 @@ public class RgCommand extends Command {
             return true;
         }
 
-        if (context.memberExists(regionName, memberId)) {
+        if (ownerId.equals(memberId) || context.memberExists(regionName, memberId)) {
             Messages.MEMBER_EXIST.send(sender);
             return true;
         }
 
-        context.addMember(regionName, memberId);
+        context.addMember(regionName, memberName, memberId);
         Messages.ADDMEMBER_SUCCESS.send(sender, memberName, regionName);
+        return true;
+    }
+
+    private boolean removemember(CommandSender sender, String[] args) {
+        if (args.length != 3) {
+            Messages.WRONG_SYNTAX.send(sender, "/rg removemember [название региона] [ник игрока]");
+            return true;
+        }
+
+        String regionName = args[1];
+
+        int length = regionName.length();
+        if (length < 3 || length > 12) {
+            Messages.RG_NAME_LENGTH.send(sender);
+            return true;
+        }
+
+        //Latin letters and numbers check
+        String pattern = "^[a-z0-9]+$";
+        if (!Pattern.matches(pattern, regionName)) {
+            Messages.RG_NAME_REGEX.send(sender);
+            return true;
+        }
+
+        if (!context.regionExists(regionName)) {
+            Messages.RG_NOT_EXIST.send(sender, regionName);
+            return true;
+        }
+
+        Player player = (Player)sender;
+
+        boolean ownerIsValid = context.getRegionOwnerId(regionName).equals(player.getUniqueId());
+        if (!ownerIsValid) {
+            Messages.RG_NOT_OWNER.send(sender);
+            return true;
+        }
+
+        String memberName = args[2];
+        if (!context.removeMember(regionName, memberName)) {
+            Messages.MEMBER_NOT_EXIST.send(sender, memberName, regionName);
+            return true;
+        }
+
+        Messages.REMOVEMEMBER_SUCCESS.send(sender, memberName, regionName);
         return true;
     }
 }

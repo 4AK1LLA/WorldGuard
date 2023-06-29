@@ -149,7 +149,7 @@ public class WorldGuardContext {
 
     public int getRegionMembersCount(String regionName) {
         Region region = regions.get(regionName).get();
-        return region.memberIds != null ? region.memberIds.size() : 0;
+        return region.members != null ? region.members.size() : 0;
     }
 
     public UUID findPlayerId(String name) {
@@ -159,14 +159,22 @@ public class WorldGuardContext {
 
     public boolean memberExists(String regionName, UUID memberId) {
         Region region = regions.get(regionName).get();
-        return memberId.equals(region.ownerId) || (region.memberIds != null && region.memberIds.contains(memberId));
+        return region.members != null && region.members.containsValue(memberId);
     }
 
-    public void addMember(String regionName, UUID memberId) {
+    public void addMember(String regionName, String memberName, UUID memberId) {
         Region region = regions.get(regionName).get();
-        if (region.memberIds == null) {
-            region.memberIds = new ArrayList<>();
+        if (region.members == null) {
+            region.members = new HashMap<>();
         }
-        region.memberIds.add(memberId);
+        region.members.put(memberName, memberId);
+    }
+
+    public boolean removeMember(String regionName, String memberName) {
+        Region region = regions.get(regionName).get();
+        if (region.members == null) {
+            return false;
+        }
+        return region.members.remove(memberName) != null;
     }
 }

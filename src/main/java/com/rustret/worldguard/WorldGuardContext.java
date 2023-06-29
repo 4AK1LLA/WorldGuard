@@ -1,5 +1,7 @@
 package com.rustret.worldguard;
 
+import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import com.j256.ormlite.dao.Dao;
@@ -44,7 +46,7 @@ public class WorldGuardContext {
                 Vector3[] coordinates = model.getCoordinates();
                 UUID ownerId = UUID.fromString(model.getOwnerId());
 
-                Region region = new Region(regionName, model.getOwnerName(), ownerId, coordinates);
+                Region region = new Region(regionName, model.getOwnerName(), ownerId, coordinates, null); //Add to DB
                 AtomicReference<Region> reference = new AtomicReference<>(region);
 
                 regions.put(regionName, reference);
@@ -97,7 +99,7 @@ public class WorldGuardContext {
     }
 
     public void addRegion(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
-        Region region = new Region(regionName, ownerName, ownerId, coordinates);
+        Region region = new Region(regionName, ownerName, ownerId, coordinates, null);
         AtomicReference<Region> reference = new AtomicReference<>(region);
         regions.put(regionName, reference);
         rtree.put(regionName, coordinates);
@@ -143,5 +145,28 @@ public class WorldGuardContext {
     public boolean getFlagValue(String regionName, String flag) {
         Region region = regions.get(regionName).get();
         return region.getFlag(flag);
+    }
+
+    public int getRegionMembersCount(String regionName) {
+        Region region = regions.get(regionName).get();
+        return region.memberIds != null ? region.memberIds.size() : 0;
+    }
+
+    public UUID findPlayerId(String name) {
+        Player player = Server.getInstance().getPlayerExact(name);
+        return (player != null) ? player.getUniqueId() : null;
+    }
+
+    public boolean memberExists(String regionName, UUID memberId) {
+        Region region = regions.get(regionName).get();
+        return memberId.equals(region.ownerId) || (region.memberIds != null && region.memberIds.contains(memberId));
+    }
+
+    public void addMember(String regionName, UUID memberId) {
+        Region region = regions.get(regionName).get();
+        if (region.memberIds == null) {
+            region.memberIds = new ArrayList<>();
+        }
+        region.memberIds.add(memberId);
     }
 }

@@ -8,7 +8,6 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.math.Vector3;
 import com.rustret.worldguard.Messages;
-import com.rustret.worldguard.entities.Region;
 import com.rustret.worldguard.WorldGuardContext;
 
 import java.util.UUID;
@@ -37,10 +36,17 @@ public class RgCommand extends Command {
                 CommandParameter.newType("regionName", CommandParamType.STRING)
         });
 
-//        commandParameters.put("addmemberCommand", new CommandParameter[] {
-//                CommandParameter.newEnum("addmemberParameter", new CommandEnum("addmemberOption", "addmember")),
-//                CommandParameter.newType("player", CommandParamType.TARGET)
-//        });
+        commandParameters.put("addmemberCommand", new CommandParameter[] {
+                CommandParameter.newEnum("addmemberParameter", new CommandEnum("addmemberOption", "addmember")),
+                CommandParameter.newType("regionName", CommandParamType.STRING),
+                CommandParameter.newType("player", CommandParamType.TARGET)
+        });
+
+        commandParameters.put("removememberCommand", new CommandParameter[] {
+                CommandParameter.newEnum("removememberParameter", new CommandEnum("removememberOption", "removemember")),
+                CommandParameter.newType("regionName", CommandParamType.STRING),
+                CommandParameter.newType("player", CommandParamType.TARGET)
+        });
     }
 
     @Override
@@ -62,6 +68,8 @@ public class RgCommand extends Command {
                 return claim(sender, args);
             case "delete":
                 return delete(sender, args);
+            case "addmember":
+                return addmember(sender, args);
             default:
                 Messages.RG_WRONG.send(sender);
                 return true;
@@ -163,7 +171,7 @@ public class RgCommand extends Command {
 
         if (!context.regionExists(regionName)) {
             Messages.RG_NOT_EXIST.send(sender, regionName);
-            return false;
+            return true;
         }
 
         Player player = (Player)sender;
@@ -171,7 +179,7 @@ public class RgCommand extends Command {
         boolean ownerIsValid = context.getRegionOwnerId(regionName).equals(player.getUniqueId());
         if (!ownerIsValid && !player.hasPermission("worldguard.god")) {
             Messages.RG_NOT_OWNER.send(sender);
-            return false;
+            return true;
         }
 
         context.removeRegion(regionName);
@@ -186,6 +194,62 @@ public class RgCommand extends Command {
         }
 
         Messages.RG_HELP.send(sender);
+        return true;
+    }
+
+    private boolean addmember(CommandSender sender, String[] args) {
+        if (args.length != 3) {
+            Messages.WRONG_SYNTAX.send(sender, "/rg addmember [название региона] [ник игрока]");
+            return true;
+        }
+
+        String regionName = args[1];
+
+        int length = regionName.length();
+        if (length < 3 || length > 12) {
+            Messages.RG_NAME_LENGTH.send(sender);
+            return true;
+        }
+
+        //Latin letters and numbers check
+        String pattern = "^[a-z0-9]+$";
+        if (!Pattern.matches(pattern, regionName)) {
+            Messages.RG_NAME_REGEX.send(sender);
+            return true;
+        }
+
+        if (!context.regionExists(regionName)) {
+            Messages.RG_NOT_EXIST.send(sender, regionName);
+            return true;
+        }
+
+        Player player = (Player)sender;
+
+        boolean ownerIsValid = context.getRegionOwnerId(regionName).equals(player.getUniqueId());
+        if (!ownerIsValid) {
+            Messages.RG_NOT_OWNER.send(sender);
+            return true;
+        }
+
+        if (context.getRegionMembersCount(regionName) > 5) {
+            Messages.MEMBERS_LIMIT.send(sender);
+            return true;
+        }
+
+        String memberName = args[2];
+        UUID memberId = context.findPlayerId(memberName);
+        if (memberId == null) {
+            Messages.PLAYER_OFFLINE.send(sender);
+            return true;
+        }
+
+        if (context.memberExists(regionName, memberId)) {
+            Messages.MEMBER_EXIST.send(sender);
+            return true;
+        }
+
+        context.addMember(regionName, memberId);
+        Messages.ADDMEMBER_SUCCESS.send(sender, memberName, regionName);
         return true;
     }
 }

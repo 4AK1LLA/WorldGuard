@@ -1,5 +1,6 @@
 package com.rustret.worldguard;
 
+import cn.nukkit.IPlayer;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.math.Vector3;
@@ -149,7 +150,7 @@ public class WorldGuardContext {
 
     public int getRegionMembersCount(String regionName) {
         Region region = regions.get(regionName).get();
-        return region.members != null ? region.members.size() : 0;
+        return region.memberIds != null ? region.memberIds.size() : 0;
     }
 
     public UUID findPlayerId(String name) {
@@ -159,22 +160,31 @@ public class WorldGuardContext {
 
     public boolean memberExists(String regionName, UUID memberId) {
         Region region = regions.get(regionName).get();
-        return region.members != null && region.members.containsValue(memberId);
+        return region.memberIds != null && region.memberIds.contains(memberId);
     }
 
-    public void addMember(String regionName, String memberName, UUID memberId) {
+    public void addMember(String regionName, UUID memberId) {
         Region region = regions.get(regionName).get();
-        if (region.members == null) {
-            region.members = new HashMap<>();
+        if (region.memberIds == null) {
+            region.memberIds = new ArrayList<>();
         }
-        region.members.put(memberName, memberId);
+        region.memberIds.add(memberId);
     }
 
     public boolean removeMember(String regionName, String memberName) {
         Region region = regions.get(regionName).get();
-        if (region.members == null) {
+        if (region.memberIds == null) {
             return false;
         }
-        return region.members.remove(memberName) != null;
+
+        for (UUID memberId: region.memberIds) {
+            IPlayer player = Server.getInstance().getOfflinePlayer(memberId);
+            if (Objects.equals(player.getName(), memberName)) {
+                region.memberIds.remove(memberId);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

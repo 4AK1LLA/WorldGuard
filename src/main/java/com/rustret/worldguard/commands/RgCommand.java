@@ -249,7 +249,7 @@ public class RgCommand extends Command {
             return true;
         }
 
-        context.addMember(regionName, memberName, memberId);
+        context.addMember(regionName, memberId);
         Messages.ADDMEMBER_SUCCESS.send(sender, memberName, regionName);
         return true;
     }

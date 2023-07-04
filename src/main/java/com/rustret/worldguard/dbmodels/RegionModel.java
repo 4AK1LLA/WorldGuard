@@ -1,8 +1,13 @@
 package com.rustret.worldguard.dbmodels;
 
 import cn.nukkit.math.Vector3;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @DatabaseTable(tableName = "regions")
 public class RegionModel {
@@ -13,8 +18,11 @@ public class RegionModel {
     @DatabaseField(unique = true)
     private String regionName;
 
+    @DatabaseField(dataType = DataType.UUID)
+    private UUID ownerId;
+
     @DatabaseField
-    private String ownerName, ownerId;
+    private String ownerName;
 
     @DatabaseField
     private double x1, y1, z1, x2, y2, z2;
@@ -22,9 +30,12 @@ public class RegionModel {
     @DatabaseField
     private boolean pvp;
 
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    private ArrayList<UUID> memberIds;
+
     public RegionModel() { }
 
-    public RegionModel(String regionName, String ownerName, String ownerId, Vector3[] coordinates, boolean pvp) {
+    public RegionModel(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, List<UUID> memberIds, boolean pvp) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
@@ -34,6 +45,7 @@ public class RegionModel {
         this.x2 = coordinates[1].x;
         this.y2 = coordinates[1].y;
         this.z2 = coordinates[1].z;
+        this.memberIds = (ArrayList<UUID>) memberIds;
         this.pvp = pvp;
     }
 
@@ -45,7 +57,7 @@ public class RegionModel {
         return ownerName;
     }
 
-    public String getOwnerId() {
+    public UUID getOwnerId() {
         return ownerId;
     }
 
@@ -55,5 +67,9 @@ public class RegionModel {
 
     public boolean getPvp() {
         return pvp;
+    }
+
+    public List<UUID> getMemberIds() {
+        return memberIds;
     }
 }

@@ -2,6 +2,7 @@ package com.rustret.worldguard.entities;
 
 import cn.nukkit.math.Vector3;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,13 +13,22 @@ public class Region {
     public Vector3[] coordinates;
     public boolean pvp;
 
-    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, List<UUID> memberIds) {
+    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, List<UUID> memberIds, boolean pvp) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
         this.coordinates = coordinates;
         this.memberIds = memberIds;
-        pvp = true;
+        this.pvp = pvp;
+    }
+
+    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
+        this.regionName = regionName;
+        this.ownerName = ownerName;
+        this.ownerId = ownerId;
+        this.coordinates = coordinates;
+        this.memberIds = new ArrayList<>();
+        this.pvp = true;
     }
 
     public void setFlag(String flag, boolean value) {

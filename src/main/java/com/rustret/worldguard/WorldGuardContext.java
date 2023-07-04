@@ -45,9 +45,9 @@ public class WorldGuardContext {
             for (RegionModel model: models) {
                 String regionName = model.getRegionName();
                 Vector3[] coordinates = model.getCoordinates();
-                UUID ownerId = UUID.fromString(model.getOwnerId());
+                UUID ownerId = model.getOwnerId();
 
-                Region region = new Region(regionName, model.getOwnerName(), ownerId, coordinates, null); //Add to DB
+                Region region = new Region(regionName, model.getOwnerName(), ownerId, coordinates, model.getMemberIds(), model.getPvp());
                 AtomicReference<Region> reference = new AtomicReference<>(region);
 
                 regions.put(regionName, reference);
@@ -73,8 +73,9 @@ public class WorldGuardContext {
                 RegionModel model = new RegionModel(
                         region.regionName,
                         region.ownerName,
-                        region.ownerId.toString(),
+                        region.ownerId,
                         region.coordinates,
+                        region.memberIds,
                         region.pvp
                 );
                 models.add(model);
@@ -100,7 +101,7 @@ public class WorldGuardContext {
     }
 
     public void addRegion(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
-        Region region = new Region(regionName, ownerName, ownerId, coordinates, null);
+        Region region = new Region(regionName, ownerName, ownerId, coordinates);
         AtomicReference<Region> reference = new AtomicReference<>(region);
         regions.put(regionName, reference);
         rtree.put(regionName, coordinates);
@@ -119,7 +120,7 @@ public class WorldGuardContext {
     }
 
     public UUID getRegionOwnerId(String regionName) {
-        return regions.get(regionName).get().ownerId;
+        return getRegion(regionName).ownerId;
     }
 
     public boolean intersectsRegion(Vector3[] coordinates) {
@@ -139,18 +140,18 @@ public class WorldGuardContext {
     }
 
     public void updateFlag(String regionName, String flag, boolean value) {
-        Region region = regions.get(regionName).get();
+        Region region = getRegion(regionName);
         region.setFlag(flag, value);
     }
 
     public boolean getFlagValue(String regionName, String flag) {
-        Region region = regions.get(regionName).get();
+        Region region = getRegion(regionName);
         return region.getFlag(flag);
     }
 
     public int getRegionMembersCount(String regionName) {
-        Region region = regions.get(regionName).get();
-        return region.memberIds != null ? region.memberIds.size() : 0;
+        Region region = getRegion(regionName);
+        return region.memberIds.size();
     }
 
     public UUID findPlayerId(String name) {
@@ -159,24 +160,17 @@ public class WorldGuardContext {
     }
 
     public boolean memberExists(String regionName, UUID memberId) {
-        Region region = regions.get(regionName).get();
-        return region.memberIds != null && region.memberIds.contains(memberId);
+        Region region = getRegion(regionName);
+        return region.memberIds.contains(memberId);
     }
 
     public void addMember(String regionName, UUID memberId) {
-        Region region = regions.get(regionName).get();
-        if (region.memberIds == null) {
-            region.memberIds = new ArrayList<>();
-        }
+        Region region = getRegion(regionName);
         region.memberIds.add(memberId);
     }
 
     public boolean removeMember(String regionName, String memberName) {
-        Region region = regions.get(regionName).get();
-        if (region.memberIds == null) {
-            return false;
-        }
-
+        Region region = getRegion(regionName);
         for (UUID memberId: region.memberIds) {
             IPlayer player = Server.getInstance().getOfflinePlayer(memberId);
             if (Objects.equals(player.getName(), memberName)) {
@@ -186,5 +180,9 @@ public class WorldGuardContext {
         }
 
         return false;
+    }
+
+    private Region getRegion(String regionName) {
+        return regions.get(regionName).get();
     }
 }

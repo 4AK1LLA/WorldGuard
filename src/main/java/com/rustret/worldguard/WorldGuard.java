@@ -9,9 +9,9 @@ public class WorldGuard extends PluginBase {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        PluginConfig.saveConfigs(this);
 
-        context = new WorldGuardContext(getConfig());
+        context = new WorldGuardContext();
         getLogger().info("Number of loaded regions - " + context.getRegionsCount());
 
         getServer().getCommandMap().register("wand", new WandCommand());

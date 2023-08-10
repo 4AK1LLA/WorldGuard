@@ -15,6 +15,7 @@ import cn.nukkit.event.player.PlayerInteractEvent;
 import com.rustret.worldguard.Messages;
 import com.rustret.worldguard.WorldGuardContext;
 
+import java.util.List;
 import java.util.UUID;
 
 public class RegionProtectionListener implements Listener {
@@ -69,18 +70,18 @@ public class RegionProtectionListener implements Listener {
     }
 
     private void checkProtection(Block block, Player player, Event event) {
-        String regionName = context.findRtreeRegionName(block);
+        String regionName = context.findRtreeRegionName(block, block.getLevel().getId());
         if (regionName == null) return;
 
-        UUID id = context.getRegionOwnerId(regionName);
-        if (id.equals(player.getUniqueId()) || player.hasPermission("worldguard.god")) return;
+        List<UUID> allowedIds = context.getAllowedIds(regionName);
+        if (allowedIds.contains(player.getUniqueId()) || player.hasPermission("worldguard.god")) return;
 
         event.setCancelled();
         Messages.FOREIGN_RG.sendPopup(player);
     }
 
     private boolean pvpAllowed(Player player) {
-        String regionName = context.findRtreeRegionName(player.getPosition());
+        String regionName = context.findRtreeRegionName(player.getPosition(), player.getLevel().getId());
         if (regionName == null) return true;
         return context.getFlagValue(regionName, "pvp");
     }

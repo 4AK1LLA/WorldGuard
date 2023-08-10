@@ -1,29 +1,39 @@
 package com.rustret.worldguard.commands;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import com.rustret.worldguard.Messages;
+import com.rustret.worldguard.PluginConfig;
 import com.rustret.worldguard.WorldGuardContext;
+import com.rustret.worldguard.entities.Region;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class RgCommand extends Command {
     private final WorldGuardContext context;
 
     public RgCommand(WorldGuardContext context) {
-        super("rg", "Создание и редактирование регионов", "/rg");
+        super("rg", PluginConfig.RG_DESCRIPTION, "/rg");
         commandParameters.clear();
 
         this.context = context;
 
         commandParameters.put("helpCommand", new CommandParameter[] {
                 CommandParameter.newEnum("helpParameter", new CommandEnum("helpOption", "help"))
+        });
+
+        commandParameters.put("listCommand", new CommandParameter[] {
+                CommandParameter.newEnum("listParameter", new CommandEnum("listOption", "list"))
         });
 
         commandParameters.put("claimCommand", new CommandParameter[] {
@@ -33,6 +43,11 @@ public class RgCommand extends Command {
 
         commandParameters.put("deleteCommand", new CommandParameter[] {
                 CommandParameter.newEnum("deleteParameter", new CommandEnum("deleteOption", "delete")),
+                CommandParameter.newType("regionName", CommandParamType.STRING)
+        });
+
+        commandParameters.put("infoCommand", new CommandParameter[] {
+                CommandParameter.newEnum("infoParameter", new CommandEnum("infoOption", "info")),
                 CommandParameter.newType("regionName", CommandParamType.STRING)
         });
 
@@ -72,6 +87,10 @@ public class RgCommand extends Command {
                 return addmember(sender, args);
             case "removemember":
                 return removemember(sender, args);
+            case "list":
+                return list(sender, args);
+            case "info":
+                return info(sender, args);
             default:
                 Messages.RG_WRONG.send(sender);
                 return true;
@@ -80,7 +99,7 @@ public class RgCommand extends Command {
 
     private boolean claim(CommandSender sender, String[] args) {
         if (args.length != 2) {
-            Messages.WRONG_SYNTAX.send(sender, "/rg claim [название региона]");
+            Messages.WRONG_SYNTAX.send(sender, PluginConfig.RG_CLAIM_USAGE);
             return true;
         }
 
@@ -100,10 +119,16 @@ public class RgCommand extends Command {
         }
 
         Player player = (Player)sender;
-        Vector3[] selection = context.getSelection(player.getId());
+        Position[] selection = context.getSelection(player.getId());
 
         if (selection == null || selection[0] == null || selection[1] == null) {
             Messages.MISSIING_SELECTION.send(sender);
+            return true;
+        }
+
+        int firstLevelId = selection[0].getLevel().getId();
+        if (firstLevelId != selection[1].getLevel().getId()) {
+            Messages.LEVEL_DIFFERENCE.send(sender);
             return true;
         }
 
@@ -137,13 +162,13 @@ public class RgCommand extends Command {
             return true;
         }
 
-        if (context.intersectsRegion(selection)) {
+        if (context.intersectsRegion(selection, firstLevelId)) {
             context.removeSelection(player.getId());
             Messages.RG_INTERSECT.send(sender);
             return true;
         }
 
-        context.addRegion(regionName, player.getName(), ownerId, selection);
+        context.addRegion(regionName, player.getName(), ownerId, selection, firstLevelId);
         context.removeSelection(player.getId());
 
         Messages.RG_CLAIM.send(sender, regionName, regionSize);
@@ -152,7 +177,7 @@ public class RgCommand extends Command {
 
     private boolean delete(CommandSender sender, String[] args) {
         if (args.length != 2) {
-            Messages.WRONG_SYNTAX.send(sender, "/rg delete [название региона]");
+            Messages.WRONG_SYNTAX.send(sender, PluginConfig.RG_DELETE_USAGE);
             return true;
         }
 
@@ -201,7 +226,7 @@ public class RgCommand extends Command {
 
     private boolean addmember(CommandSender sender, String[] args) {
         if (args.length != 3) {
-            Messages.WRONG_SYNTAX.send(sender, "/rg addmember [название региона] [ник игрока]");
+            Messages.WRONG_SYNTAX.send(sender, PluginConfig.RG_ADDMEMBER_USAGE);
             return true;
         }
 
@@ -256,7 +281,7 @@ public class RgCommand extends Command {
 
     private boolean removemember(CommandSender sender, String[] args) {
         if (args.length != 3) {
-            Messages.WRONG_SYNTAX.send(sender, "/rg removemember [название региона] [ник игрока]");
+            Messages.WRONG_SYNTAX.send(sender, PluginConfig.RG_REMOVEMEMBER_USAGE);
             return true;
         }
 
@@ -295,6 +320,54 @@ public class RgCommand extends Command {
         }
 
         Messages.REMOVEMEMBER_SUCCESS.send(sender, memberName, regionName);
+        return true;
+    }
+
+    private boolean list(CommandSender sender, String[] args) {
+        if (args.length != 1) {
+            Messages.WRONG_SYNTAX.send(sender, "/rg list");
+            return true;
+        }
+
+        Player player = (Player) sender;
+        List<String> regionNames = context.getPlayerRegionNames(player.getUniqueId());
+
+        if (regionNames.isEmpty()) {
+            Messages.REGIONS_EMPTY.send(player);
+            return true;
+        }
+
+        Messages.RG_LIST.send(player, String.join(", ", regionNames));
+        return true;
+    }
+
+    private boolean info(CommandSender sender, String[] args) {
+        if (args.length != 2) {
+            Messages.WRONG_SYNTAX.send(sender, "/rg info");
+            return true;
+        }
+
+        String regionName = args[1];
+
+        if (!context.regionExists(regionName)) {
+            Messages.RG_NOT_EXIST.send(sender, regionName);
+            return true;
+        }
+
+        Region region = context.getRegion(regionName);
+
+        String ownerName = Server.getInstance().getOfflinePlayer(region.ownerId).getName();
+
+        List<String> memberNamesList = region.memberIds.stream()
+                .map(memberId -> Server.getInstance().getOfflinePlayer(memberId).getName())
+                .collect(Collectors.toList());
+
+        String memberNames = (memberNamesList.isEmpty()) ? Messages.RG_NO_MEMBERS.get() : String.join(", ", memberNamesList);
+
+        String point1 = Messages.COORDINATES.get((int) region.coordinates[0].x, (int) region.coordinates[0].y, (int) region.coordinates[0].z);
+        String point2 = Messages.COORDINATES.get((int) region.coordinates[1].x, (int) region.coordinates[1].y, (int) region.coordinates[1].z);
+
+        Messages.RG_INFO.send(sender, regionName, ownerName, memberNames, point1, point2);
         return true;
     }
 }

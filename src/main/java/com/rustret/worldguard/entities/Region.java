@@ -12,21 +12,24 @@ public class Region {
     public List<UUID> memberIds;
     public Vector3[] coordinates;
     public boolean pvp;
+    public int levelId;
 
-    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, List<UUID> memberIds, boolean pvp) {
+    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, int levelId, List<UUID> memberIds, boolean pvp) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
         this.coordinates = coordinates;
         this.memberIds = memberIds;
+        this.levelId = levelId;
         this.pvp = pvp;
     }
 
-    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
+    public Region(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, int levelId) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
         this.coordinates = coordinates;
+        this.levelId = levelId;
         this.memberIds = new ArrayList<>();
         this.pvp = true;
     }

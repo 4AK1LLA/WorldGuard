@@ -10,8 +10,8 @@ public class PluginConfig {
         plugin.saveDefaultConfig();
         config = plugin.getConfig();
 
-        plugin.saveResource("messages.yml");
-        messages = new Config(plugin.getDataFolder() + "/messages.yml");
+        plugin.saveResource("translations.yml");
+        messages = new Config(plugin.getDataFolder() + "/translations.yml");
 
         FLAG_DESCRIPTION = messages.getString("command-descriptions.flag");
         RG_DESCRIPTION = messages.getString("command-descriptions.rg");

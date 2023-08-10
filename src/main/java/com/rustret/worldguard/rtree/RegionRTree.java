@@ -6,35 +6,48 @@ import com.github.davidmoten.rtreemulti.RTree;
 import com.github.davidmoten.rtreemulti.geometry.Point;
 import com.github.davidmoten.rtreemulti.geometry.Rectangle;
 
-import java.util.Iterator;
+import java.util.*;
 
 public class RegionRTree {
-    private RTree<String, Rectangle> rtree = RTree.dimensions(3).create();
+    private final Map<Integer, RTree<String, Rectangle>> map = new HashMap<>();
 
-    public void put(String regionName, Vector3[] coordinates) {
+    public RegionRTree(Set<Integer> levelIds) {
+        for (int levelId: levelIds) {
+            map.put(levelId, RTree.dimensions(3).create());
+        }
+    }
+
+    public void put(String regionName, Vector3[] coordinates, int levelId) {
+        RTree<String, Rectangle> rtree = map.get(levelId);
         rtree = rtree.add(regionName, createRectangle(coordinates));
+        map.put(levelId, rtree);
     }
 
-    public void remove(String regionName, Vector3[] coordinates) {
+    public void remove(String regionName, Vector3[] coordinates, int levelId) {
+        RTree<String, Rectangle> rtree = map.get(levelId);
         rtree = rtree.delete(regionName, createRectangle(coordinates));
+        map.put(levelId, rtree);
     }
 
-    public boolean intersects(Vector3 point) {
+    public boolean intersects(Vector3 point, int levelId) {
+        RTree<String, Rectangle> rtree = map.get(levelId);
         return rtree.search(Point.create(point.x, point.y, point.z)).iterator().hasNext();
     }
 
-    public boolean intersects(Vector3[] coordinates) {
+    public boolean intersects(Vector3[] coordinates, int levelId) {
+        RTree<String, Rectangle> rtree = map.get(levelId);
         return rtree.search(createRectangle(coordinates)).iterator().hasNext();
     }
 
-    public String findRegionName(Vector3 point) {
+    public String findRegionName(Vector3 point, int levelId) {
+        RTree<String, Rectangle> rtree = map.get(levelId);
         Iterator<Entry<String, Rectangle>> result = rtree.search(Point.create(point.x, point.y, point.z)).iterator();
 
         return result.hasNext() ? result.next().value() : null;
     }
 
-    public String asString() {
-        return rtree.asString();
+    public String asString(int levelId) {
+        return map.get(levelId).asString();
     }
 
     private Rectangle createRectangle(Vector3[] coordinates) {

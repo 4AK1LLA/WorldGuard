@@ -7,13 +7,14 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.nbt.tag.CompoundTag;
 import com.rustret.worldguard.Messages;
+import com.rustret.worldguard.PluginConfig;
 
 import java.util.UUID;
 
 public class WandCommand extends Command {
 
     public WandCommand() {
-        super("wand", "Получить топорик для создания региона", "/wand");
+        super("wand", PluginConfig.WAND_DESCRIPTION, "/wand");
         commandParameters.clear();
     }
 
@@ -50,7 +51,7 @@ public class WandCommand extends Command {
         wandAxe.setCustomName("Wand топор");
 
         player.getInventory().addItem(wandAxe);
-        Messages.WAND.send(sender);
+        Messages.WAND.send(sender, PluginConfig.RG_CLAIM_USAGE);
 
         return false;
     }

@@ -28,6 +28,9 @@ public class RegionModel {
     private double x1, y1, z1, x2, y2, z2;
 
     @DatabaseField
+    private int levelId;
+
+    @DatabaseField
     private boolean pvp;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
@@ -35,7 +38,7 @@ public class RegionModel {
 
     public RegionModel() { }
 
-    public RegionModel(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, List<UUID> memberIds, boolean pvp) {
+    public RegionModel(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, int levelId, List<UUID> memberIds, boolean pvp) {
         this.regionName = regionName;
         this.ownerName = ownerName;
         this.ownerId = ownerId;
@@ -45,6 +48,7 @@ public class RegionModel {
         this.x2 = coordinates[1].x;
         this.y2 = coordinates[1].y;
         this.z2 = coordinates[1].z;
+        this.levelId = levelId;
         this.memberIds = (ArrayList<UUID>) memberIds;
         this.pvp = pvp;
     }
@@ -63,6 +67,10 @@ public class RegionModel {
 
     public Vector3[] getCoordinates() {
         return new Vector3[] { new Vector3(x1, y1, z1), new Vector3(x2, y2, z2) };
+    }
+
+    public int getLevelId() {
+        return levelId;
     }
 
     public boolean getPvp() {

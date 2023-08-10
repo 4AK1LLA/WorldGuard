@@ -6,6 +6,7 @@ import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
+import com.rustret.worldguard.PluginConfig;
 import com.rustret.worldguard.WorldGuardContext;
 
 import java.util.Arrays;
@@ -15,7 +16,7 @@ public class FlagCommand extends Command {
     private final String[] flags = { "pvp" };
 
     public FlagCommand(WorldGuardContext context) {
-        super("flag", "Установить значение определенного флага для региона", "/flag");
+        super("flag", PluginConfig.FLAG_DESCRIPTION, "/flag");
         this.context = context;
         setPermission("worldguard.flag");
 
@@ -34,7 +35,7 @@ public class FlagCommand extends Command {
         }
 
         if (args.length != 3) {
-            Messages.WRONG_SYNTAX.send(sender, "/flag [регион] [флаг] [allow/deny]");
+            Messages.WRONG_SYNTAX.send(sender, PluginConfig.FLAG_USAGE);
             return true;
         }
 

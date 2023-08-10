@@ -3,8 +3,8 @@ package com.rustret.worldguard;
 import cn.nukkit.IPlayer;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.Config;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -16,19 +16,20 @@ import com.rustret.worldguard.rtree.RegionRTree;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 
 public class WorldGuardContext {
     private final String connectionString;
-    private final Map<Long, Vector3[]> selections = new HashMap<>();
+    private final Map<Long, Position[]> selections = new HashMap<>();
     private final Map<String, AtomicReference<Region>> regions = new HashMap<>();
     private final Map<UUID, List<AtomicReference<Region>>> playerRegions = new HashMap<>();
-    private final RegionRTree rtree = new RegionRTree();
+    private final RegionRTree rtree = new RegionRTree(Server.getInstance().getLevels().keySet());
 
-    WorldGuardContext(Config config) {
+    WorldGuardContext() {
         connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s",
-                config.get("MySql.host"), (int)config.get("MySql.port"), config.get("MySql.database"),
-                config.get("MySql.username"), config.get("MySql.password"));
+                PluginConfig.getHost(), PluginConfig.getPort(), PluginConfig.getDatabase(),
+                PluginConfig.getUsername(), PluginConfig.getPassword());
 
         loadDatabase();
     }
@@ -46,12 +47,13 @@ public class WorldGuardContext {
                 String regionName = model.getRegionName();
                 Vector3[] coordinates = model.getCoordinates();
                 UUID ownerId = model.getOwnerId();
+                int levelId = model.getLevelId();
 
-                Region region = new Region(regionName, model.getOwnerName(), ownerId, coordinates, model.getMemberIds(), model.getPvp());
+                Region region = new Region(regionName, model.getOwnerName(), ownerId, coordinates, levelId, model.getMemberIds(), model.getPvp());
                 AtomicReference<Region> reference = new AtomicReference<>(region);
 
                 regions.put(regionName, reference);
-                rtree.put(regionName, coordinates);
+                rtree.put(regionName, coordinates, levelId);
                 playerRegions.computeIfAbsent(ownerId, k -> new ArrayList<>()).add(reference);
             }
         }
@@ -75,6 +77,7 @@ public class WorldGuardContext {
                         region.ownerName,
                         region.ownerId,
                         region.coordinates,
+                        region.levelId,
                         region.memberIds,
                         region.pvp
                 );
@@ -88,11 +91,11 @@ public class WorldGuardContext {
         }
     }
 
-    public Vector3[] getSelection(long playerId) {
+    public Position[] getSelection(long playerId) {
         return selections.get(playerId);
     }
 
-    public void setSelection(long playerId, Vector3[] selection) {
+    public void setSelection(long playerId, Position[] selection) {
         selections.put(playerId, selection);
     }
 
@@ -100,31 +103,39 @@ public class WorldGuardContext {
         selections.remove(playerId);
     }
 
-    public void addRegion(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates) {
-        Region region = new Region(regionName, ownerName, ownerId, coordinates);
+    public void addRegion(String regionName, String ownerName, UUID ownerId, Vector3[] coordinates, int levelId) {
+        Region region = new Region(regionName, ownerName, ownerId, coordinates, levelId);
         AtomicReference<Region> reference = new AtomicReference<>(region);
         regions.put(regionName, reference);
-        rtree.put(regionName, coordinates);
+        rtree.put(regionName, coordinates, levelId);
         playerRegions.computeIfAbsent(ownerId, k -> new ArrayList<>()).add(reference);
     }
 
     public void removeRegion(String regionName) {
         AtomicReference<Region> reference = regions.remove(regionName);
         Region region = reference.get();
-        rtree.remove(regionName, region.coordinates);
+        rtree.remove(regionName, region.coordinates, region.levelId);
         playerRegions.get(region.ownerId).removeIf(ref -> ref.get() == region);
     }
 
-    public String findRtreeRegionName(Vector3 point) {
-        return rtree.findRegionName(point);
+    public String findRtreeRegionName(Vector3 point, int levelId) {
+        return rtree.findRegionName(point, levelId);
     }
 
     public UUID getRegionOwnerId(String regionName) {
         return getRegion(regionName).ownerId;
     }
 
-    public boolean intersectsRegion(Vector3[] coordinates) {
-        return rtree.intersects(coordinates);
+    public List<UUID> getAllowedIds(String regionName) {
+        Region region = getRegion(regionName);
+        List<UUID> result = new ArrayList<>(region.memberIds);
+        result.add(region.ownerId);
+
+        return result;
+    }
+
+    public boolean intersectsRegion(Vector3[] coordinates, int levelId) {
+        return rtree.intersects(coordinates, levelId);
     }
 
     public int getRegionsCount() {
@@ -182,7 +193,18 @@ public class WorldGuardContext {
         return false;
     }
 
-    private Region getRegion(String regionName) {
+    public List<String> getPlayerRegionNames(UUID playerId) {
+        List<AtomicReference<Region>> regionRefs = playerRegions.get(playerId);
+        if (regionRefs == null) return Collections.emptyList();
+
+        return regionRefs
+                .stream()
+                .map(AtomicReference::get)
+                .map(region -> region.regionName)
+                .collect(Collectors.toList());
+    }
+
+    public Region getRegion(String regionName) {
         return regions.get(regionName).get();
     }
 }

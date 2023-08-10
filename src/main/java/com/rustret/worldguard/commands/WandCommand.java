@@ -7,7 +7,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.nbt.tag.CompoundTag;
 import com.rustret.worldguard.Messages;
-import com.rustret.worldguard.PluginConfig;
 
 import java.util.UUID;
 

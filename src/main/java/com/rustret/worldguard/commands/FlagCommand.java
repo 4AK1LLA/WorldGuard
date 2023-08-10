@@ -6,7 +6,6 @@ import cn.nukkit.command.data.CommandEnum;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import com.rustret.worldguard.Messages;
-import com.rustret.worldguard.PluginConfig;
 import com.rustret.worldguard.WorldGuardContext;
 
 import java.util.Arrays;

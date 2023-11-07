@@ -1,0 +1,23 @@
+[
+  {
+    "name": "qwerty",
+    "owner": "UIEIE-fFJRIGJRI-FEKJIFOE",
+    "pvp": false,
+    "secret": false,
+    "level": 1,
+    "members": [
+      "FELGPRGR-KGRKO-GKROGKOR",
+      "FRGHRGNV-gmgKRMGKR-fKFg"
+    ],
+    "min": {
+      "x": -20,
+      "y": 30,
+      "z": -10
+    },
+    "max": {
+      "x": 20,
+      "y": 40,
+      "z": 20
+    }
+  }
+]

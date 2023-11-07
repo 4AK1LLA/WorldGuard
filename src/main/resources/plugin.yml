@@ -1,13 +1,12 @@
 name: WorldGuard
-main: com.rustret.worldguard.WorldGuard
+main: com.rustret.rg.WorldGuard
 version: "1.0.0"
-api: ["1.0.14"]
+api: ["1.0.0"]
+author: rustret
 description: Plugin for protecting players area
 
-permissions:
-  worldguard.god:
-    description: "Allows to delete others regions, removes region size limit"
-    default: false
-  worldguard.flag:
-    description: "Gives access to /flag"
-    default: false
+commands:
+  wand:
+    usage: "/wand"
+  rg:
+    rg: "/rg"

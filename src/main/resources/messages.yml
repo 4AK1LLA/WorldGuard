@@ -6,22 +6,26 @@ wand:
   full-inventory: "Your inventory is full"
   success: "You received wand axe"
 
-rg:
-  claim:
-    name-length: "Region name must be between 3 and 10 characters"
-    name-regex: "Region name must consist of lowercase letters a-z and numbers 0-9"
-    selection-missing: "You did not select two points with wand axe"
-    level-mismatch: "Region points must be set in the same world"
-    side-length: "Region length, width and height must be up to 50 blocks"
-    size: "Region size must be up to 50000 blocks"
-  no-parameters: "|
-    List of all region commands:
-    - /wand - get wand axe for region claiming
-    - /rg claim <region> - create region
-    - /rg delete <region> - delete region
-    - /rg addmember <region> <player> - add member to region
-    - /rg removemember <region> <player> - remove member from region
-    - /rg list - show your regions"
+claim:
+  name-length: "Region name must be between %d and %d characters"
+  name-regex: "Region name must consist of lowercase letters a-z and numbers 0-9"
+  selection-missing: "You did not select two points with wand axe"
+  level-mismatch: "Region points must be set in the same world"
+  side-length: "Region length, width and height must be up to 50 blocks"
+  size: "Region size must be up to %d blocks"
+  region-exist: "Region with name %s already exists"
+  count-limit: "You reached limit for number of regions"
+  intersect: "Selected area intersects another region"
+  success: "You created region with name %s"
+
+help: "|
+  List of all region commands:
+  - /wand - get wand axe for region claiming
+  - /rg claim <region> - create region
+  - /rg delete <region> - delete region
+  - /rg addmember <region> <player> - add member to region
+  - /rg removemember <region> <player> - remove member from region
+  - /rg list - show your regions"
 
 not-your-region: This is not your region
 pvp-not-allowed: PVP is not allowed here
@@ -33,13 +37,11 @@ unacceptable-members-count: Region must have up to %d members.
 name-is-taken: Region with name %s already exists.
 region-not-found: Region with such name does not exist.
 not-owner: You are not owner of the region.
-selection-intersects-region: Selected area intersects another region.
 member-already-exist: Member already exists.
 member-not-found: Member not found.
 own-no-regions: You do not have regions.
 
 flag-success: Flag %s for region %s was set to %s.
-claim-success: Region %s was created. Its size is %d blocks.
 delete-success: Region %s was deleted.
 addmember-success: Player %s was added to region %s.
 removemember-success: Player %s was removed from region %s.

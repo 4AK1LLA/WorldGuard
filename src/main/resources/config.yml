@@ -1,3 +1,9 @@
 # WorldGuard plugin config
 
 wand-name: "§cWand axe"
+
+min-name-length: 3
+max-name-length: 10
+
+max-side-length: 50
+max-size: 30000

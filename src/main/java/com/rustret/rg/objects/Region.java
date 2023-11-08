@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class Region {
-    public final String name;
-    public final UUID owner;
-    public final Vector3 min, max;
-    public final int level;
+    public String name;
+    public UUID owner;
+    public Vector3 min, max;
+    public int level;
     public List<UUID> members;
     public boolean pvp, secret;
 

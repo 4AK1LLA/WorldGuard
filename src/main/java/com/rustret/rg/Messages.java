@@ -3,50 +3,21 @@ package com.rustret.rg;
 import cn.nukkit.utils.Config;
 
 public class Messages {
-//    FOREIGN_RG ("rg-foreign"),
-//    NO_PVP ("rg-no-pvp"),
-//    COORDINATES ("coordinates"),
-//    WRONG_SYNTAX ("wrong-syntax-error"),
-//    FULL_INVENTORY ("full-inventory-error"),
-//    WAND ("wand-success"),
-//    NOT_PLAYER ("not-player-error"),
-//    PLAYER_OFFLINE ("player-offline-error"),
-//    FLAG_INVALID ("flag-invalid-error"),
-//    FLAG_SUCCESS ("flag-success"),
-//    FIRST_POS ("rg-first-point"),
-//    SECOND_POS ("rg-second-point"),
-//    RG ("rg"),
-//    RG_WRONG ("rg-parameter-error"),
-//    RG_NAME_LENGTH ("rg-name-length-error"),
-//    RG_NAME_REGEX ("rg-name-regex-error"),
-//    MISSIING_SELECTION ("rg-selection-missing-error"),
-//    RG_SIZE_LIMIT ("rg-size-error"),
-//    RG_SIDE_LIMIT ("rg-side-length-error"),
-//    RG_CLAIM ("rg-claim-success"),
-//    RG_EXIST ("rg-name-exist-error"),
-//    RG_NOT_EXIST ("rg-not-exist-error"),
-//    RG_NOT_OWNER ("rg-not-owner-error"),
-//    RG_DELETE ("rg-delete-success"),
-//    RG_INTERSECT ("rg-intersect-error"),
-//    RG_COUNT_LIMIT ("rg-count-error"),
-//    MEMBERS_LIMIT ("rg-member-count-error"),
-//    ADDMEMBER_SUCCESS ("rg-addmember-success"),
-//    MEMBER_EXIST ("rg-member-exist-error"),
-//    MEMBER_NOT_EXIST ("rg-member-not-exist-error"),
-//    REMOVEMEMBER_SUCCESS ("rg-removemember-success"),
-//    LEVEL_DIFFERENCE ("rg-level-error"),
-//    REGIONS_EMPTY ("rg-empty-error"),
-//    RG_LIST ("rg-list-success"),
-//    RG_INFO ("rg-info-success"),
-//    RG_HELP ("rg-help-success"),
-//    RG_NO_MEMBERS ("rg-no-members");
-    public final String
-        SELECTION_POS1 = "You set first point to X: %d | Y: %d | Z: %d",
-        SELECTION_POS2 = "You set second point to X: %d | Y: %d | Z: %d",
-        FULL_INVENTORY = "Your inventory is full",
-        WAND = "You received wand axe";
+    public final String SELECTION_POS1, SELECTION_POS2, FULL_INVENTORY, WAND_SUCCESS, RG_HELP,
+            CLAIM_NAME_LENGTH, CLAIM_NAME_REGEX, CLAIM_SELECTION_MISSING, CLAIM_LEVEL_MISMATCH,
+            CLAIM_SIDE_LENGTH, CLAIM_SIZE;
 
     public Messages(Config cfg) {
-
+        SELECTION_POS1 = cfg.getString("selection.pos1");
+        SELECTION_POS2 = cfg.getString("selection.pos2");
+        FULL_INVENTORY = cfg.getString("wand.full-inventory");
+        WAND_SUCCESS = cfg.getString("wand.success");
+        RG_HELP = cfg.getString("rg.no-parameters");
+        CLAIM_NAME_LENGTH = cfg.getString("rg.claim.name-length");
+        CLAIM_NAME_REGEX = cfg.getString("rg.claim.name-regex");
+        CLAIM_SELECTION_MISSING = cfg.getString("rg.claim.selection-missing");
+        CLAIM_LEVEL_MISMATCH = cfg.getString("rg.claim.level-mismatch");
+        CLAIM_SIDE_LENGTH = cfg.getString("rg.claim.side-length");
+        CLAIM_SIZE = cfg.getString("rg.claim.size");
     }
 }

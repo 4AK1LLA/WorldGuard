@@ -33,7 +33,7 @@ public class Storage {
      * <p><tt>false</tt> if region was not created because of intersecting
      * with another region.
      */
-    public boolean checkIntersectAndAdd(String name, UUID id, Selection s) {
+    public boolean checkIntersectAndAddRegion(String name, UUID id, Selection s) {
         Rectangle rectangle = mapRectangle(s.pos1, s.pos2);
         int level = s.pos1.level.getId();
 
@@ -50,6 +50,13 @@ public class Storage {
                 .add(region);
         rtree = rtree.add(region, rectangle);
         return true;
+    }
+
+    public void removeRegion(Region region) {
+        regions.remove(region.name);
+        players.get(region.owner)
+                .removeIf(rg -> rg == region);
+        rtree = rtree.delete(region, mapRectangle(region.min, region.max));
     }
 
     private Rectangle mapRectangle(Vector3 min, Vector3 max) {

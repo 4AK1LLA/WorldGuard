@@ -7,3 +7,5 @@ max-name-length: 10
 
 max-side-length: 50
 max-size: 30000
+
+max-members: 5

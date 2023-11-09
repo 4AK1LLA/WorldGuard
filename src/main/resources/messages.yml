@@ -14,10 +14,11 @@ claim:
   name-regex: "Region name must consist of lowercase letters a-z and numbers 0-9"
   selection-missing: "You did not select two points with wand axe"
   level-mismatch: "Region points must be set in the same world"
+  level-wrong: "You can not claim region in this world"
   side-length: "Region length, width and height must be up to %d blocks"
   size: "Region size must be up to %d blocks"
   region-exist: "Region with name %s already exists"
-  count-limit: "You reached limit for number of regions"
+  count-limit: "You can not have more than %d regions"
   intersect: "Selected area intersects another region"
   success: "You created region with name %s"
 

@@ -5,12 +5,12 @@ import cn.nukkit.Server;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.level.Level;
 import cn.nukkit.utils.Config;
 import com.rustret.rg.objects.Region;
 import com.rustret.rg.objects.Selection;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Commands {
@@ -19,6 +19,7 @@ public class Commands {
     private final Item wand;
     private final int minName, maxName, maxLength, maxSize, maxMembers;
     private final String god = "rg.god";
+    private final List<Integer> levels;
 
     public Commands(Storage storage, Messages messages, Config cfg) {
         this.storage = storage;
@@ -29,6 +30,15 @@ public class Commands {
         this.maxLength = cfg.getInt("max-side-length");
         this.maxSize = cfg.getInt("max-size");
         this.maxMembers = cfg.getInt("max-members");
+
+        this.levels = cfg.getStringList("worlds")
+                .stream()
+                .map(name -> {
+                    Level level = Server.getInstance().getLevelByName(name);
+                    return level != null ? level.getId() : -1;
+                })
+                .filter(id -> id != -1)
+                .collect(Collectors.toList());
 
         String wandName = cfg.getString("wand-name");
         this.wand = Item
@@ -57,9 +67,17 @@ public class Commands {
             return;
         }
 
-        if (s.pos1.level.getId() != s.pos2.level.getId()) {
+        int level1 = s.pos1.level.getId();
+        int level2 = s.pos2.level.getId();
+        if (level1 != level2) {
             storage.removeSelection(id);
             player.sendMessage(messages.CLAIM_LEVEL_MISMATCH);
+            return;
+        }
+
+        if (!player.hasPermission(god) && !levels.contains(level1)) {
+            storage.removeSelection(id);
+            player.sendMessage(messages.CLAIM_LEVEL_WRONG);
             return;
         }
 
@@ -86,8 +104,9 @@ public class Commands {
             return;
         }
 
-        if (!player.hasPermission(god) && storage.getNumberOfRegions(id) >= 2) {
-            player.sendMessage(messages.CLAIM_COUNT_LIMIT);
+        int limit = getLimit(player);
+        if (!player.hasPermission(god) && storage.getNumberOfRegions(id) >= limit) {
+            player.sendMessage(String.format(messages.CLAIM_COUNT_LIMIT, limit));
             return;
         }
 
@@ -105,6 +124,18 @@ public class Commands {
                         "[WorldGuard] Region created: %s | Owner: %s(%s) | Level: %s | Min: X=%d,Y=%d,Z=%d | Max: X=%d,Y=%d,Z=%d",
                         name, player.getName(), id, s.pos1.level.getName(),
                         (int) s.pos1.x, (int) s.pos1.y, (int) s.pos1.z, (int) s.pos2.x, (int) s.pos2.y, (int) s.pos2.z));
+    }
+
+    private int getLimit(Player player) {
+        Optional<Integer> limit = player.getEffectivePermissions().values()
+                .stream()
+                .filter(info -> info.getValue() && info.getPermission().matches("rg\\.limit\\.\\d+"))
+                .map(info -> Integer.parseInt(info.getPermission().replaceAll("\\D", "")))
+                .max(Integer::compareTo);
+
+        //throw new IllegalStateException("Permission with limit for regions not found");
+        return limit.orElse(0);
+
     }
 
     public void delete(Player player, String name) {

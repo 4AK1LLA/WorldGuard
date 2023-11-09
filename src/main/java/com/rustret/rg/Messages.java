@@ -9,7 +9,7 @@ public class Messages {
             CLAIM_SUCCESS, REGION_NOT_EXIST, NOT_OWNER, DELETE_SUCCESS, MEMBER_COUNT,
             PLAYER_NOT_FOUND, MEMBER_EXIST, ADDMEMBER_SUCCESS, MEMBER_NOT_FOUND, REMOVEMEMBER_SUCCESS,
             LIST_EMPTY, LIST_START, LIST_ENTRY, LIST_DELIMITER, LIST_NO_MEMBERS, FLAG_VALUE,
-            FLAG_SUCCESS, FLAG_WRONG;
+            FLAG_SUCCESS, FLAG_WRONG, CLAIM_LEVEL_WRONG;
 
     public Messages(Config cfg) {
         SELECTION_POS1 = cfg.getString("selection.pos1");
@@ -21,6 +21,7 @@ public class Messages {
         CLAIM_NAME_REGEX = cfg.getString("claim.name-regex");
         CLAIM_SELECTION_MISSING = cfg.getString("claim.selection-missing");
         CLAIM_LEVEL_MISMATCH = cfg.getString("claim.level-mismatch");
+        CLAIM_LEVEL_WRONG = cfg.getString("claim.level-wrong");
         CLAIM_SIDE_LENGTH = cfg.getString("claim.side-length");
         CLAIM_SIZE = cfg.getString("claim.size");
         CLAIM_REGION_EXIST = cfg.getString("claim.region-exist");

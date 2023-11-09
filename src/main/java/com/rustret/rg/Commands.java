@@ -18,7 +18,7 @@ public class Commands {
     private final Messages messages;
     private final Item wand;
     private final int minName, maxName, maxLength, maxSize, maxMembers;
-    private final String regex = "^[a-z0-9]+$", god = "rg.god";
+    private final String god = "rg.god";
 
     public Commands(Storage storage, Messages messages, Config cfg) {
         this.storage = storage;
@@ -44,7 +44,7 @@ public class Commands {
             return;
         }
 
-        if (!name.matches(regex)) {
+        if (!name.matches("^[a-z0-9]+$")) {
             player.sendMessage(messages.CLAIM_NAME_REGEX);
             return;
         }
@@ -99,6 +99,12 @@ public class Commands {
 
         storage.removeSelection(id);
         player.sendMessage(String.format(messages.CLAIM_SUCCESS, name));
+        Server.getInstance()
+                .getLogger()
+                .info(String.format(
+                        "[WorldGuard] Region created: %s | Owner: %s(%s) | Level: %s | Min: X=%d,Y=%d,Z=%d | Max: X=%d,Y=%d,Z=%d",
+                        name, player.getName(), id, s.pos1.level.getName(),
+                        (int) s.pos1.x, (int) s.pos1.y, (int) s.pos1.z, (int) s.pos2.x, (int) s.pos2.y, (int) s.pos2.z));
     }
 
     public void delete(Player player, String name) {
@@ -116,6 +122,10 @@ public class Commands {
 
         storage.removeRegion(region);
         player.sendMessage(String.format(messages.DELETE_SUCCESS, name));
+        Server.getInstance()
+                .getLogger()
+                .info(String.format("[WorldGuard] Region deleted: %s | Owner: %s(%s)",
+                        name, player.getName(), region.owner));
     }
 
     public void addmember(Player player, String name, String memberName) {

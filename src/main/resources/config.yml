@@ -1,11 +1,20 @@
 # WorldGuard plugin config
+# * - can be bypassed by [rg.god] permission
 
+# Display name of the wand axe in inventory
 wand-name: "§cWand axe"
 
+# Min and max length of region name
 min-name-length: 3
 max-name-length: 10
 
+# * Max side length of region (in blocks)
 max-side-length: 50
+# * Max size (capacity) of region (in blocks)
 max-size: 30000
 
+# Max number of members (players) per region
 max-members: 5
+
+# * Worlds where players can claim regions
+worlds: [ "world" ]

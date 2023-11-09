@@ -17,7 +17,12 @@ public class Main extends PluginBase {
         saveDefaultConfig();
         saveResource("messages.yml");
 
-        this.storage = new Storage();
+        this.storage = new Storage(this);
+        int count = storage.load();
+        Server.getInstance()
+                .getLogger()
+                .info("[WorldGuard] Successfully loaded " + count + " regions.");
+
         this.messages = new Messages(new Config(getDataFolder() + "/messages.yml"));
         this.cmd = new Commands(storage, messages, getConfig());
 
@@ -27,7 +32,7 @@ public class Main extends PluginBase {
 
         Server.getInstance()
                 .getLogger()
-                .info("[WorldGuard] Plugin enabled");
+                .info("[WorldGuard] Plugin enabled.");
     }
 
     @Override
@@ -50,8 +55,10 @@ public class Main extends PluginBase {
 
     @Override
     public void onDisable() {
+        storage.unload();
+
         Server.getInstance()
                 .getLogger()
-                .info("[WorldGuard] Plugin disabled");
+                .info("[WorldGuard] Plugin disabled. Regions data saved.");
     }
 }

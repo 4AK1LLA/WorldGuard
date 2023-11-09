@@ -25,4 +25,12 @@ public class Region {
         this.pvp = true;
         this.secret = false;
     }
+
+    public Region(String name, UUID owner, Vector3 min, Vector3 max, int level, List<UUID> members, boolean pvp, boolean secret) {
+        this(name, owner, min, max, level);
+
+        this.members = members;
+        this.pvp = pvp;
+        this.secret = secret;
+    }
 }

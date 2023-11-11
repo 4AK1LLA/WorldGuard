@@ -145,7 +145,7 @@ public class MainListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onEntityDestroyProtection(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player) {
             if (e.getEntity() instanceof EntityCreature) return;
@@ -265,5 +265,24 @@ public class MainListener implements Listener {
                 || player.hasPermission("rg.god")
                 || player.getUniqueId() == rg.owner
                 || rg.members.contains(player.getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPvpProtection(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player
+                && e.getEntity() instanceof Player) {
+            Player damager = (Player) e.getDamager();
+
+            if (damager.hasPermission("rg.god")) return;
+            if (pvpAllowed(damager) && pvpAllowed(e.getEntity())) return;
+
+            e.setCancelled();
+            damager.sendMessage("You can not PVP here");
+        }
+    }
+
+    private boolean pvpAllowed(Position pos) {
+        Region rg = storage.intersectedRegion(pos.floor());
+        return rg == null || rg.pvp;
     }
 }

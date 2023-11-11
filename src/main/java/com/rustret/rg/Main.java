@@ -46,7 +46,7 @@ public class Main extends PluginBase {
             case "removemember": cmd.removemember(player, args[1], args[2]); break;
             case "list": cmd.list(player); break;
             case "wand": cmd.wand(player); break;
-            case "flag": cmd.flag(player, args[1], args[2], args[3]);
+            case "flag": cmd.flag(player, args[1], args[2], args[3]); break;
             default: cmd.help(player); break;
         }
 

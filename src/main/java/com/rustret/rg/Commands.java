@@ -177,14 +177,14 @@ public class Commands {
             return;
         }
 
-        Player member = Server.getInstance().getPlayer(memberName);
+        Player member = Server.getInstance().getPlayerExact(memberName);
         if (member == null) {
             player.sendMessage(messages.PLAYER_NOT_FOUND);
             return;
         }
 
         UUID memberId = member.getUniqueId();
-        if (region.owner == memberId || region.members.contains(memberId)) {
+        if (region.owner.equals(memberId) || region.members.contains(memberId)) {
             player.sendMessage(messages.MEMBER_EXIST);
             return;
         }

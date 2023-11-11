@@ -39,6 +39,10 @@ public class Main extends PluginBase {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
+        if (args.length == 0) {
+            cmd.help(player);
+            return true;
+        }
         switch (args[0]) {
             case "claim": cmd.claim(player, args[1]); break;
             case "delete": cmd.delete(player, args[1]); break;
@@ -47,7 +51,8 @@ public class Main extends PluginBase {
             case "list": cmd.list(player); break;
             case "wand": cmd.wand(player); break;
             case "flag": cmd.flag(player, args[1], args[2], args[3]); break;
-            default: cmd.help(player); break;
+            case "info": cmd.info(player); break;
+            default: throw new IllegalArgumentException("[WorldGuard] Invalid argument for /rg command");
         }
 
         return true;

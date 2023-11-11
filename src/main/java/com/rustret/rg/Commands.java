@@ -283,4 +283,29 @@ public class Commands {
     public void help(Player player) {
         player.sendMessage(messages.HELP);
     }
+
+    public void info(Player player) {
+        Region rg = storage.intersectedRegion(player.floor());
+
+        if (rg == null) {
+            player.sendMessage(messages.INFO_NOT_FOUND);
+            return;
+        }
+
+        List<String> flags = new ArrayList<>();
+        if (rg.pvp) flags.add("pvp");
+        if (rg.secret) flags.add("secret");
+        List<String> members = rg.members
+                .stream()
+                .map(id -> Server.getInstance().getOfflinePlayer(id).getName())
+                .collect(Collectors.toList());
+
+        player.sendMessage(String.format(
+                messages.INFO_SUCCESS, rg.name,
+                Server.getInstance().getOfflinePlayer(rg.owner).getName(), rg.owner.toString(),
+                flags.isEmpty() ? messages.INFO_NONE : String.join(", ", flags), rg.level,
+                (int) rg.min.x, (int) rg.min.y, (int) rg.min.z, (int) rg.max.x, (int) rg.max.y, (int) rg.max.z,
+                members.isEmpty() ? messages.INFO_NONE : String.join(messages.INFO_DELIMITER, members))
+        );
+    }
 }

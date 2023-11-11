@@ -51,11 +51,23 @@ flag:
   wrong: "Available flags: pvp, secret"
   success: "You changed flag %s to %s in region %s"
 
-help: "|
+help: |
   List of all region commands:
   - /rg wand - get wand axe for region claiming
   - /rg claim <region> - create region
   - /rg delete <region> - delete region
   - /rg addmember <region> <player> - add member to region
   - /rg removemember <region> <player> - remove member from region
-  - /rg list - see your regions"
+  - /rg list - see your regions
+
+info:
+  not-found: "No region found at your current position"
+  delimiter: ", "
+  none: "none"
+  success: |
+    Region info:
+    name - %s
+    owner - %s(%s)
+    flags - %s
+    coords - level(%d), min(x=%d,y=%d,z=%d), max(x=%d,y=%d,z=%d)
+    members - %s

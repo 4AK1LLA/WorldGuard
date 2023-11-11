@@ -9,7 +9,8 @@ public class Messages {
             CLAIM_SUCCESS, REGION_NOT_EXIST, NOT_OWNER, DELETE_SUCCESS, MEMBER_COUNT,
             PLAYER_NOT_FOUND, MEMBER_EXIST, ADDMEMBER_SUCCESS, MEMBER_NOT_FOUND, REMOVEMEMBER_SUCCESS,
             LIST_EMPTY, LIST_START, LIST_ENTRY, LIST_DELIMITER, LIST_NO_MEMBERS, FLAG_VALUE,
-            FLAG_SUCCESS, FLAG_WRONG, CLAIM_LEVEL_WRONG, PROTECT_PVP, PROTECT_INTERACT;
+            FLAG_SUCCESS, FLAG_WRONG, CLAIM_LEVEL_WRONG, PROTECT_PVP, PROTECT_INTERACT,
+            INFO_NOT_FOUND, INFO_DELIMITER, INFO_SUCCESS, INFO_NONE;
 
     public Messages(Config cfg) {
         SELECTION_POS1 = cfg.getString("selection.pos1");
@@ -47,5 +48,9 @@ public class Messages {
         FLAG_WRONG = cfg.getString("flag.wrong");
         PROTECT_PVP = cfg.getString("protection.no-pvp");
         PROTECT_INTERACT = cfg.getString("protection.no-interaction");
+        INFO_NOT_FOUND = cfg.getString("info.not-found");
+        INFO_DELIMITER = cfg.getString("info.delimiter");
+        INFO_SUCCESS = cfg.getString("info.success");
+        INFO_NONE = cfg.getString("info.none");
     }
 }

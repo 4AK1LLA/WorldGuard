@@ -36,7 +36,7 @@ public class MainListener implements Listener {
 
     @EventHandler
     public void onWandSelect(PlayerInteractEvent event) {
-        if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+        if (event.isCancelled() || event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             return;
         }
 
@@ -186,7 +186,7 @@ public class MainListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInteractProtection(PlayerInteractEvent e) {
         Item item = e.getItem();
         Block block = e.getBlock();
@@ -221,10 +221,9 @@ public class MainListener implements Listener {
             }
         }
         else if (e.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            // return if item is wand
-            if (item.getId() == Item.WOODEN_AXE && item.hasEnchantment(-1)) return;
             if (
-                    item.getId() == Item.DYE && item.getDamage() == 0x0F && block.canBeActivated() // bone meal
+                    item.getId() == Item.WOODEN_AXE && item.hasEnchantment(-1) // checking rg on wand
+                    || item.getId() == Item.DYE && item.getDamage() == 0x0F && block.canBeActivated() // bone meal
                     || block instanceof BlockBed
                     || block.getId() == Block.NOTEBLOCK
                     || block.getId() == Block.JUKEBOX && item instanceof ItemRecord
@@ -263,7 +262,7 @@ public class MainListener implements Listener {
         Region rg = storage.intersectedRegion(pos);
         return rg == null
                 || player.hasPermission("rg.god")
-                || player.getUniqueId() == rg.owner
+                || rg.owner.equals(player.getUniqueId())
                 || rg.members.contains(player.getUniqueId());
     }
 

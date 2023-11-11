@@ -146,7 +146,7 @@ public class Commands {
             return;
         }
 
-        if (!player.hasPermission(god) && region.owner != player.getUniqueId()) {
+        if (!player.hasPermission(god) && !region.owner.equals(player.getUniqueId())) {
             player.sendMessage(messages.NOT_OWNER);
             return;
         }
@@ -167,7 +167,7 @@ public class Commands {
             return;
         }
 
-        if (!player.hasPermission(god) && region.owner != player.getUniqueId()) {
+        if (!player.hasPermission(god) && !region.owner.equals(player.getUniqueId())) {
             player.sendMessage(messages.NOT_OWNER);
             return;
         }
@@ -201,7 +201,7 @@ public class Commands {
             return;
         }
 
-        if (!player.hasPermission(god) && region.owner != player.getUniqueId()) {
+        if (!player.hasPermission(god) && !region.owner.equals(player.getUniqueId())) {
             player.sendMessage(messages.NOT_OWNER);
             return;
         }

@@ -1,9 +1,12 @@
 package com.rustret.rg;
 
+import cn.nukkit.Player;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.plugin.Plugin;
 import com.github.davidmoten.rtreemulti.Entry;
 import com.github.davidmoten.rtreemulti.RTree;
+import com.github.davidmoten.rtreemulti.geometry.Point;
 import com.github.davidmoten.rtreemulti.geometry.Rectangle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -167,5 +170,12 @@ public class Storage {
         o.addProperty("z", (int) pos.z);
 
         return o;
+    }
+
+    public Region intersectedRegion(Position pos) {
+        for (Entry<Region, Rectangle> e : rtree.search(Point.create(pos.x, pos.y, pos.z))) {
+            if (e.value().level == pos.level.getId()) return e.value();
+        }
+        return null;
     }
 }

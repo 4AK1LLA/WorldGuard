@@ -20,6 +20,7 @@ import cn.nukkit.item.*;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.Vector3;
 import com.rustret.rg.objects.Region;
 import com.rustret.rg.objects.Selection;
 
@@ -201,20 +202,30 @@ public class MainListener implements Listener {
             }
         }
         else if (e.getAction() == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
-            if (block.getSide(e.getFace()).getId() == Block.FIRE) {
+            if (block.getId() == Block.NOTEBLOCK) {
                 if (allowed(player, block)) {
                     return;
                 }
                 e.setCancelled();
                 player.sendMessage("You can not do this");
+                return;
+            }
+            Block fire = block.getSide(e.getFace());
+            if (fire.getId() == Block.FIRE) {
+                if (allowed(player, block)) {
+                    return;
+                }
+                e.setCancelled();
+                player.sendMessage("You can not do this");
+                block.level.sendBlocks(new Player[]{player}, new Vector3[]{fire});
             }
         }
         else if (e.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            // return if item is wand
             if (item.getId() == Item.WOODEN_AXE && item.hasEnchantment(-1)) return;
             if (
                     item.getId() == Item.DYE && item.getDamage() == 0x0F && block.canBeActivated() // bone meal
                     || block instanceof BlockBed
-                    || block.getId() == Block.CAULDRON_BLOCK && item instanceof ItemBucket
                     || block.getId() == Block.NOTEBLOCK
                     || block.getId() == Block.JUKEBOX && item instanceof ItemRecord
                     || block.getId() == Block.FLOWER_POT_BLOCK
@@ -234,7 +245,10 @@ public class MainListener implements Listener {
                     || block.getId() == Block.TNT && (item.getId() == Item.FLINT_STEEL || item.getId() == Item.FIRE_CHARGE
                             || item.hasEnchantment(Enchantment.ID_FIRE_ASPECT))
                     || item.getId() == Item.BOAT
-                    || block instanceof BlockRail && item.getId() == Item.MINECART) {
+                    || block instanceof BlockRail && item.getId() == Item.MINECART
+                    || item instanceof ItemBucket // preventing waterlogging bugs
+                    || block.getId() == Block.ENDER_CHEST
+            ) {
 
                 if (allowed(player, block)) {
                     return;

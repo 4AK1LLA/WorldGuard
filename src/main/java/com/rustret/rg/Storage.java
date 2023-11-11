@@ -1,6 +1,5 @@
 package com.rustret.rg;
 
-import cn.nukkit.Player;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.plugin.Plugin;

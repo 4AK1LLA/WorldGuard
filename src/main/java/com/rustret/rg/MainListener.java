@@ -19,6 +19,7 @@ import cn.nukkit.inventory.InventoryType;
 import cn.nukkit.item.*;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import com.rustret.rg.objects.Region;
@@ -82,7 +83,6 @@ public class MainListener implements Listener {
         Position pos = (Position) inventory.getHolder();
         if (!allowed(player, pos)) {
             e.setCancelled();
-            e.getPlayer().sendMessage("You can not do this");
         }
     }
 
@@ -94,7 +94,6 @@ public class MainListener implements Listener {
             return;
         }
         e.setCancelled();
-        player.sendMessage("You can not do this");
     }
 
     @EventHandler
@@ -102,7 +101,6 @@ public class MainListener implements Listener {
         Player player = e.getPlayer();
         if (!allowed(player, e.getBlock())) {
             e.setCancelled();
-            player.sendMessage("You can not do this");
         }
     }
 
@@ -112,7 +110,6 @@ public class MainListener implements Listener {
         Player player = e.getPlayer();
         if (!allowed(player, e.getBlock())) {
             e.setCancelled();
-            player.sendMessage("You can not do this");
         }
     }
 
@@ -121,7 +118,6 @@ public class MainListener implements Listener {
         Player player = e.getPlayer();
         if (!allowed(player, e.getBlockClicked())) {
             e.setCancelled();
-            player.sendMessage("You can not do this");
         }
     }
 
@@ -130,7 +126,6 @@ public class MainListener implements Listener {
         Player player = e.getPlayer();
         if (!allowed(player, e.getBlockClicked())) {
             e.setCancelled();
-            player.sendMessage("You can not do this");
         }
     }
 
@@ -141,7 +136,6 @@ public class MainListener implements Listener {
         Player player = e.getPlayer();
         if (!allowed(player, e.getEntity())) {
             e.setCancelled();
-            player.sendMessage("You can not do this");
         }
     }
 
@@ -153,7 +147,6 @@ public class MainListener implements Listener {
             Player player = (Player) e.getDamager();
             if (!allowed(player, e.getEntity())) {
                 e.setCancelled();
-                player.sendMessage("You can not do this");
             }
         }
     }
@@ -163,7 +156,6 @@ public class MainListener implements Listener {
         Player player = e.getPlayer();
         if (!allowed(player, e.getBlock())) {
             e.setCancelled();
-            player.sendMessage("You can not do this");
         }
     }
 
@@ -173,7 +165,6 @@ public class MainListener implements Listener {
             Player player = (Player) e.getEntity();
             if (!allowed(player, e.getBlock())) {
                 e.setCancelled();
-                player.sendMessage("You can not do this");
             }
         }
     }
@@ -198,7 +189,6 @@ public class MainListener implements Listener {
                     return;
                 }
                 e.setCancelled();
-                player.sendMessage("You can not do this");
             }
         }
         else if (e.getAction() == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
@@ -207,7 +197,6 @@ public class MainListener implements Listener {
                     return;
                 }
                 e.setCancelled();
-                player.sendMessage("You can not do this");
                 return;
             }
             Block fire = block.getSide(e.getFace());
@@ -216,7 +205,6 @@ public class MainListener implements Listener {
                     return;
                 }
                 e.setCancelled();
-                player.sendMessage("You can not do this");
                 block.level.sendBlocks(new Player[]{player}, new Vector3[]{fire});
             }
         }
@@ -249,21 +237,26 @@ public class MainListener implements Listener {
                     || block.getId() == Block.ENDER_CHEST
             ) {
 
-                if (allowed(player, block)) {
-                    return;
+                if (!allowed(player, block)) {
+                    e.setCancelled();
                 }
-                e.setCancelled();
-                player.sendMessage("You can not do this");
             }
         }
     }
 
     private boolean allowed(Player player, Position pos) {
         Region rg = storage.intersectedRegion(pos);
-        return rg == null
+        if (rg == null
                 || player.hasPermission("rg.god")
                 || rg.owner.equals(player.getUniqueId())
-                || rg.members.contains(player.getUniqueId());
+                || rg.members.contains(player.getUniqueId())) {
+            return true;
+        }
+        if (!rg.secret) {
+            player.sendPopup(messages.PROTECT_INTERACT);
+            //player.level.addSound(pos, Sound.BLOCK_FALSE_PERMISSIONS, 1.0F, 1.0F, player);
+        }
+        return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -276,7 +269,7 @@ public class MainListener implements Listener {
             if (pvpAllowed(damager) && pvpAllowed(e.getEntity())) return;
 
             e.setCancelled();
-            damager.sendMessage("You can not PVP here");
+            damager.sendMessage(messages.PROTECT_PVP);
         }
     }
 

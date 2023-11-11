@@ -1,6 +1,10 @@
 region-not-exist: "Region with such name does not exist"
 region-not-owner: "You are not owner of this region"
 
+protection:
+  no-interaction: "This is not your region"
+  no-pvp: "PVP is not allowed here"
+
 selection:
   pos1: "You set first point to X: %d | Y: %d | Z: %d"
   pos2: "You set second point to X: %d | Y: %d | Z: %d"
@@ -55,7 +59,3 @@ help: "|
   - /rg addmember <region> <player> - add member to region
   - /rg removemember <region> <player> - remove member from region
   - /rg list - see your regions"
-
-spawn-interaction: Interaction is now allowed here
-no-interaction: This is not your region
-no-pvp: PVP is not allowed here

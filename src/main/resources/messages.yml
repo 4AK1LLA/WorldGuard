@@ -1,0 +1,73 @@
+region-not-exist: "Region with such name does not exist"
+region-not-owner: "You are not owner of this region"
+
+protection:
+  no-interaction: "This is not your region"
+  no-pvp: "PVP is not allowed here"
+
+selection:
+  pos1: "You set first point to X: %d | Y: %d | Z: %d"
+  pos2: "You set second point to X: %d | Y: %d | Z: %d"
+
+wand:
+  full-inventory: "Your inventory is full"
+  success: "You received wand axe"
+
+claim:
+  name-length: "Region name must be between %d and %d characters"
+  name-regex: "Region name must consist of lowercase letters a-z and numbers 0-9"
+  selection-missing: "You did not select two points with wand axe"
+  level-mismatch: "Region points must be set in the same world"
+  level-wrong: "You can not claim region in this world"
+  side-length: "Region length, width and height must be up to %d blocks"
+  size: "Region size must be up to %d blocks"
+  region-exist: "Region with name %s already exists"
+  count-limit: "You can not have more than %d regions"
+  intersect: "Selected area intersects another region"
+  success: "You created region with name %s"
+
+delete:
+  success: "You deleted region with name %s"
+
+addmember:
+  member-count: "You reached limit for members"
+  player-not-found: "Player does not exist or is offline"
+  member-exist: "Player is already a member in that region"
+  success: "You added member %s to region %s"
+
+removemember:
+  member-not-found: "Member not found"
+  success: "You removed member %s from region %s"
+
+list:
+  empty: "You do not have regions"
+  start: "Your regions:"
+  entry: "\n- %s (X: %d | Y: %d | Z: %d)\nMembers: "
+  delimiter-members: ", "
+  no-members: "no members"
+
+flag:
+  value: "Flag value can be allow or deny"
+  wrong: "Available flags: pvp, secret, mobs"
+  success: "You changed flag %s to %s in region %s"
+
+help: |
+  List of all region commands:
+  - /rg wand - get wand axe for region claiming
+  - /rg claim <region> - create region
+  - /rg delete <region> - delete region
+  - /rg addmember <region> <player> - add member to region
+  - /rg removemember <region> <player> - remove member from region
+  - /rg list - see your regions
+
+info:
+  not-found: "No region found at your current position"
+  delimiter: ", "
+  none: "none"
+  success: |
+    Region info:
+    name - %s
+    owner - %s(%s)
+    flags - %s
+    coords - level(%d), min(x=%d,y=%d,z=%d), max(x=%d,y=%d,z=%d)
+    members - %s

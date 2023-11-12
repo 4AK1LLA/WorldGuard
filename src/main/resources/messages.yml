@@ -48,7 +48,7 @@ list:
 
 flag:
   value: "Flag value can be allow or deny"
-  wrong: "Available flags: pvp, secret"
+  wrong: "Available flags: pvp, secret, mobs"
   success: "You changed flag %s to %s in region %s"
 
 help: |

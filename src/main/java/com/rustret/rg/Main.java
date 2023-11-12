@@ -8,7 +8,6 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 
 public class Main extends PluginBase {
-    private Messages messages;
     private Storage storage;
     private Commands cmd;
 
@@ -16,6 +15,7 @@ public class Main extends PluginBase {
     public void onEnable() {
         saveDefaultConfig();
         saveResource("messages.yml");
+        Messages messages = new Messages(new Config(getDataFolder() + "/messages.yml"));
 
         this.storage = new Storage(this);
         int count = storage.load();
@@ -23,7 +23,6 @@ public class Main extends PluginBase {
                 .getLogger()
                 .info("[WorldGuard] Successfully loaded " + count + " regions.");
 
-        this.messages = new Messages(new Config(getDataFolder() + "/messages.yml"));
         this.cmd = new Commands(storage, messages, getConfig());
 
         Server.getInstance()

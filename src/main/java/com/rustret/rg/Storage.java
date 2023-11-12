@@ -41,8 +41,6 @@ public class Storage {
 
     /**
      * Creates region if its coordinates do not intersect other regions
-     * Appends the specified element to the end of this list (optional
-     * operation).
      *
      * @return <tt>true</tt> if region was created and added to regions,
      * players and rtree.
@@ -102,6 +100,7 @@ public class Storage {
             UUID owner = UUID.fromString(rgObj.get("owner").getAsString());
             boolean pvp = rgObj.get("pvp").getAsBoolean();
             boolean secret = rgObj.get("secret").getAsBoolean();
+            boolean mobs = rgObj.get("mobs").getAsBoolean();
             int level = rgObj.get("level").getAsInt();
 
             List<UUID> members = new ArrayList<>();
@@ -112,7 +111,7 @@ public class Storage {
             Vector3 min = mapVector3(rgObj.getAsJsonObject("min"));
             Vector3 max = mapVector3(rgObj.getAsJsonObject("max"));
 
-            Region region = new Region(name, owner, min, max, level, members, pvp, secret);
+            Region region = new Region(name, owner, min, max, level, members, pvp, secret, mobs);
             regions.put(name, region);
             players.computeIfAbsent(owner, k -> new ArrayList<>())
                     .add(region);
@@ -140,6 +139,7 @@ public class Storage {
             rgObj.addProperty("owner", region.owner.toString());
             rgObj.addProperty("pvp", region.pvp);
             rgObj.addProperty("secret", region.secret);
+            rgObj.addProperty("mobs", region.mobs);
             rgObj.addProperty("level", region.level);
 
             JsonArray memberArr = new JsonArray();

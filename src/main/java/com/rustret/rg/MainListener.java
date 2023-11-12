@@ -2,6 +2,7 @@ package com.rustret.rg;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.*;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.EventHandler;
@@ -216,7 +217,6 @@ public class MainListener implements Listener {
                     || block.getId() == Block.NOTEBLOCK
                     || block.getId() == Block.JUKEBOX && item instanceof ItemRecord
                     || block.getId() == Block.FLOWER_POT_BLOCK
-                    || block.getId() == 461 // bell
                     || block.getId() == Block.END_PORTAL_FRAME && item.getId() == Item.ENDER_EYE
                     || block instanceof BlockRedstoneDiode // comparator, repeater
                     || block instanceof BlockButton
@@ -276,5 +276,20 @@ public class MainListener implements Listener {
     private boolean pvpAllowed(Position pos) {
         Region rg = storage.intersectedRegion(pos.floor());
         return rg == null || rg.pvp;
+    }
+
+    @EventHandler
+    public void onMobSpawnProtection(EntitySpawnEvent e) {
+        Entity entity = e.getEntity();
+
+        if (entity instanceof Player) {
+            return;
+        }
+
+        if (entity instanceof EntityCreature) {
+            Region rg = storage.intersectedRegion(entity.getPosition());
+            if (rg == null || rg.mobs) return;
+            entity.close();
+        }
     }
 }

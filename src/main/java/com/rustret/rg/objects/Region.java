@@ -12,7 +12,7 @@ public class Region {
     public Vector3 min, max;
     public int level;
     public List<UUID> members;
-    public boolean pvp, secret;
+    public boolean pvp, secret, mobs;
 
     public Region(String name, UUID owner, Vector3 min, Vector3 max, int level) {
         this.name = name;
@@ -24,13 +24,15 @@ public class Region {
         this.members = new ArrayList<>();
         this.pvp = true;
         this.secret = false;
+        this.mobs = true;
     }
 
-    public Region(String name, UUID owner, Vector3 min, Vector3 max, int level, List<UUID> members, boolean pvp, boolean secret) {
+    public Region(String name, UUID owner, Vector3 min, Vector3 max, int level, List<UUID> members, boolean pvp, boolean secret, boolean mobs) {
         this(name, owner, min, max, level);
 
         this.members = members;
         this.pvp = pvp;
         this.secret = secret;
+        this.mobs = mobs;
     }
 }

@@ -276,6 +276,10 @@ public class Commands {
                 region.secret = val;
                 player.sendMessage(String.format(messages.FLAG_SUCCESS, "secret", value, name));
                 break;
+            case "mobs":
+                region.mobs = val;
+                player.sendMessage(String.format(messages.FLAG_SUCCESS, "mobs", value, name));
+                break;
             default: player.sendMessage(messages.FLAG_WRONG); break;
         }
     }
@@ -295,6 +299,7 @@ public class Commands {
         List<String> flags = new ArrayList<>();
         if (rg.pvp) flags.add("pvp");
         if (rg.secret) flags.add("secret");
+        if (rg.mobs) flags.add("mobs");
         List<String> members = rg.members
                 .stream()
                 .map(id -> Server.getInstance().getOfflinePlayer(id).getName())
